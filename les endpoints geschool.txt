@@ -1,0 +1,534 @@
+/* ============== Auth deb ============== */
+Authentification:
+- Login(post)
+{
+	'access_token',
+		'username',
+		'phone_info',
+		'new_password',
+		'old_password', //pas obligatoire
+		'keycentre',
+		'registration_id',
+		
+}
+
+- Changer mot de passe(post)
+{
+	'access_token',
+		'username', //pas obligatoire
+		'phone_info', //pas obligatoire
+		'new_password',
+		'old_password',
+		'keycentre', //pas obligatoire
+		'registration_id',
+		
+}
+
+- Mettre a jour Profile(post)
+{
+	'access_token',
+		'email',
+		'password',
+		'registration',
+		'phone_info',
+		'nom',
+		'prenoms',
+		'url_image',
+		
+}
+
+- Retour Login // Pour l'instant
+{
+	'status',
+	'message',
+	'token',
+	'reset_pass',
+	'isadmin',
+	'user': {},
+	'apprenant': {},
+	'personnel': {},
+	'annee_encours': {},
+	'mes_missions:'{},
+	'mes_absences:'{},
+	'mes_affectations:'{},
+}
+/* ============== Auth end ============== */
+
+
+/* ============== User deb ============== */
+User:
+- Detail(post) //Pas vraiment necessairew puisque qu'on deja ca dans les auths
+{
+	'access_token',
+		'key',
+		
+}
+- Retour Detail // Ici c'est pour decrire comment les details de l'User seront
+{
+	'token',
+	'status',
+	'message',
+	'user': {
+		'key',
+		'idcentre,'
+		'nom',
+		'prenom',
+		'email',
+		'phone',
+		'photo',
+		'profil',
+		'datenaissance',
+		'adresseuser',
+		'default_centre',
+		'status',
+		'apiId',
+	}
+},
+/* ============== User end ============== */
+
+/* ============== Apprenant deb ============== */
+Apprenant:
+- Liste(post)
+{
+	'access_token',
+	
+}
+
+- Modification(post)
+{
+	'access_token',
+	'key',
+	'idsuer',
+	'idcentre',
+	'sexe',
+	'matricule',
+	'lieunaissance',
+	'status',
+	'apiId',
+}
+
+- Detail(post)
+{
+	'access_token',
+	'key',
+	
+}
+
+- Retour Detail
+{
+	'status',
+	'message',
+	'apprenant': {
+		'key',
+		'idsuer',
+		'idcentre',
+		'sexe',
+		'matricule',
+		'lieunaissance',
+		'status',
+		'apiId',
+	}
+}
+/* ============== Apprenant end ============== */
+
+/* ============== Personnel deb ============== */
+Personnel:
+- Liste(post)
+{
+	'access_token',
+	
+}
+
+- Modification(post)
+{
+	'access_token',
+	'key',
+	'idsuer',
+	'idcentre',
+	'iddiplome',
+	'idtypepersonnel',
+	'indicegrade',
+	'matricule',
+	'dateembauche',
+	'section',
+	'autrecompetence',
+	'status',
+	'apiId',
+}
+
+- Detail(post)
+{
+	'access_token',
+	'key',
+	
+}
+
+- Retour Detail
+{
+	'status',
+	'message',
+	'personnel': {
+		'key',
+		'idsuer',
+		'idcentre',
+		'iddiplome',
+		'idtypepersonnel',
+		'indicegrade',
+		'matricule',
+		'dateembauche',
+		'section',
+		'autrecompetence',
+		'status',
+		'apiId',
+	}
+}
+/* ============== Personnel end ============== */
+
+/* ============== Centre deb ============== */
+Centre:
+- Liste(post)
+{
+	'access_token',
+	
+}
+
+- Modification(post)
+{
+	'access_token',
+	'key',
+	'denomination',
+	'localite',
+	'sms_disponible',
+	'prefecture',
+	'nomcourt',
+	'telephone',
+	'email',
+	'siteweb',
+	'reseausociaux',
+	'inspection',
+	'lienlogo',
+	'latitude',
+	'longitude',
+	'status',
+	
+}
+
+- Detail(post)
+{
+	'access_token',
+	'key',
+	
+}
+
+- Retour Detail
+{
+	'status',
+	'message',
+	'centre': {
+		'key',
+		'denomination',
+		'localite',
+		'smsDisponible',
+		'prefecture',
+		'nomcourt',
+		'telephone',
+		'email',
+		'siteweb',
+		'reseausociaux',
+		'inspection',
+		'lienlogo',
+		'latitude',
+		'longitude',
+		'status',
+		'apiId',
+	}
+}
+/* ============== Centre end ============== */
+
+/* ============== Annee Scolaire deb ============== */
+Anneescolaire:
+- Liste(post)
+{
+	'access_token',
+		
+}
+
+- Modification(post)
+{
+	'access_token',
+		'key',
+		'libelle',
+		'datedebut',
+		'datefin',
+		'idcentre',
+		'status',
+		'apiId',
+		
+}
+
+- Detail(post)
+{
+	'access_token',
+		'key',
+		
+}
+
+- Retour Detail
+{
+	'status',
+		'message',
+		'anneescolaire': {
+		'key',
+			'libelle',
+			'datedebut',
+			'datefin',
+			'idcentre',
+			'status',
+			'apiId',
+	}
+}
+/* ============== Annee Scolaire end ============== */
+/* ============== Mission deb ============== */
+Missions:
+- Liste(post)
+{
+	'access_token',
+		
+}
+
+- Modification(post)
+{
+	'access_token',
+		'key',
+		'motif',
+		'lieu',
+		'itineraire',
+		'datedepart',
+		'dateretourprob',
+		'idcentre',
+		'status',
+		
+}
+
+- Detail(post)
+{
+	'access_token',
+		'key',
+		
+}
+
+- Retour Detail
+{
+	'status',
+		'message',
+		'mission': {
+		'key',
+			'motif',
+			'lieu',
+			'itineraire',
+			'datedepart',
+			'dateretourprob',
+			'idcentre',
+			'status',
+			'apiId',
+	}
+}
+/* ============== Mission end ============== */
+/* ============== Absence deb ============== */
+Absences:
+- Liste(post)
+{
+	'access_token',
+		
+}
+
+- Modification(post)
+{
+	'access_token',
+		'key',
+		'idtypeabsence',
+		'idcentre',
+		'iduser',
+		'autorise',
+		'datedemande',
+		'datedebut',
+		'heuredebut',
+		'datefin',
+		'heurefin',
+		'motif',
+		'coordonnees',
+		'lieudestination',
+		'heurearattraper',
+		'status',
+		
+}
+
+- Detail(post)
+{
+	'access_token',
+		'key',
+		
+}
+
+- Retour Detail
+{
+	'status',
+		'message',
+		'absence': {
+		'key',
+			'idtypeabsence',
+			'idcentre',
+			'iduser',
+			'autorise',
+			'datedemande',
+			'datedebut',
+			'heuredebut',
+			'datefin',
+			'heurefin',
+			'motif',
+			'coordonnees',
+			'lieudestination',
+			'heurearattraper',
+			'status',
+	}
+}
+/* ============== Absence end ============== */
+/* ============== Affectation deb ============== */
+Affectations:
+- Liste(post)
+{
+	'access_token',
+		
+}
+
+- Modification(post)
+{
+	'access_token',
+		'key',
+		'idcentre',
+		'iduser',
+		'datedebut',
+		'datedebuteffective',
+		'datefin',
+		'datefineffective',
+		'status',
+		
+}
+
+- Detail(post)
+{
+	'access_token',
+		'key',
+		
+}
+
+- Retour Detail
+{
+	'status',
+		'message',
+		'affectation': {
+		'key',
+			'idcentre',
+			'iduser',
+			'datedebut',
+			'datedebuteffective',
+			'datefin',
+			'datefineffective',
+			'status',
+			'apiId',
+	}
+}
+/* ============== Affectation end ============== */
+/* ============== Tache deb ============== */
+Taches:
+- Liste(post)
+{
+	'access_token',
+	
+}
+
+- Modification(post)
+{
+	'access_token',
+	'key',
+	
+	'key',
+	'idcentre',
+	'iduser',
+	'description',
+	'datetache',
+	'daterappel',
+	'rapport',
+	'etat',
+	'apiId',
+}
+
+- Detail(post)
+{
+	'access_token',
+	'key',
+	
+}
+
+- Retour Detail
+{
+	'status',
+	'message',
+	'tache': {
+		'key',
+		'idcentre',
+		'iduser',
+		'description',
+		'datetache',
+		'daterappel',
+		'rapport',
+		'etat',
+		'apiId',
+	}
+}
+/* ============== Tache end ============== */
+/* ============== Gestion des Notes deb ============== */
+Notes:
+- Liste(post)
+{
+	'access_token',
+		
+}
+
+- Modification(post)
+{
+	'access_token',
+	'key',
+	
+	'idcentre',
+	'iduser',
+	'idevaluation',
+	'note',
+	'status',
+}
+
+- Detail(post)
+{
+	'access_token',
+	'key',
+	
+}
+
+- Retour Detail
+{
+	'status',
+	'message',
+	'note': {
+	'key',
+		'idcentre',
+		'iduser',
+		'idevaluation',
+		'note',
+		'status',
+		'apiId',
+	}
+}
+
+- Mes notes
+{}
+/* ============== Gestion des Notes end ============== */

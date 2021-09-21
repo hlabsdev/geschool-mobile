@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Are You Here</string>
+
+    <string name="google_apikey">AIzaSyAlZvj0jqYgnv3rUClU-FALoNICiojPvdo</string>
+    <string name="facebook_app_id">790545451521816</string>
+    <string name="fb_login_protocol_scheme">fb790545451521816</string>
+
+</resources>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "345447889062",
+    "firebase_url": "https://go-fast-5fc3d.firebaseio.com",
+    "project_id": "go-fast-5fc3d",
+    "storage_bucket": "go-fast-5fc3d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:345447889062:android:2ae8187ba1a3d666105c67",
+        "android_client_info": {
+          "package_name": "com.clin.geschool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "345447889062-8gbnlk48tlm8hajlukg3m98euerve9g3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.clin.geschool",
+            "certificate_hash": "cfd2d691f00d717d3feb9c3d47821b52c51d8065"
+          }
+        },
+        {
+          "client_id": "345447889062-nk639fobaonbmdnhegf29o8vtk75g6b4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlZvj0jqYgnv3rUClU-FALoNICiojPvdo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "345447889062-nk639fobaonbmdnhegf29o8vtk75g6b4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
