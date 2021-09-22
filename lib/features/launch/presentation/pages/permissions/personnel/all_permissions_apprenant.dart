@@ -579,51 +579,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
     );
   }
 
-  // ignore: missing_return
-  void getInfos1() {
-    print("En recuperation...");
-    loading(true);
-    Api api = ApiRepository();
-    api.getPerms(infoDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de recuperes
-            setState(() {
-              information = a.information;
-              /* Listes */
-              if (permissionFilter.length > 0) permissionFilter.clear();
-              permissionFilter.addAll(information);
-              allChk = true;
-
-              permissionFilter.sort((a, b) =>
-                  DateTime.tryParse(b.datedemandepermission)
-                      .compareTo(DateTime.tryParse(a.datedemandepermission)));
-              separate(permissionFilter);
-            });
-            loading(false);
-            return true;
-          } else {
-            // Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message);
-            return false;
-          }
-        });
-      } else if (value.isLeft()) {
-        setState(() {
-          error = true;
-        });
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    }, onError: (error) {
-      // Navigator.of(context).pop(null);
-      FunctionUtils.displaySnackBar(context, error.message);
-    });
-  }
-
-  void getCentre() {
+  getCentre() {
     print("En recuperation...");
     Api api = ApiRepository();
     api.getCentre(infoDto).then((value) {

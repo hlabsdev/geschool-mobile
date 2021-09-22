@@ -25,6 +25,7 @@ class DataConstantesUtils {
   static const String ALL_AFFECTATIONS_SERVER_URL = "/affectations/all";
   static const String ALL_PERMISSIONS_SERVER_URL = "/permissions/all";
   static const String ALL_APPRENANTS_SERVER_URL = "/apprenants/all";
+  static const String ALL_BUDGETS_SERVER_URL = "/budgets/all";
   /*lists end*/
 
   /* Auxiliaires deb */
@@ -46,6 +47,7 @@ class DataConstantesUtils {
   static const String NEW_ABSENCE_APPRENANT_SERVER_URL =
       "/absences/add_absence3";
   static const String NEW_PERMISSION_URL = "/permissions/add";
+  static const String NEW_BUDGET_URL = "/budgets/add";
   /* Ajout end */
 
   static const int APP_SERVER_PORT = 0;

@@ -531,8 +531,7 @@ class _AllTasksState extends State<AllTasks> {
       if (date != null) {
         tachesFilter.clear();
         tachesFilter = widget.taches
-            .filter(
-                (task) => DateTime.parse(task.dateTache).compareTo(date) == 0)
+            .filter((task) => DateTime.parse(task.dateTache) == date)
             .toList();
         allChk = false;
         // FunctionUtils.sortTaches(tachesFilter);

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:geschool/core/error/Failure.dart';
 import 'package:geschool/features/common/data/dto/add_abs_dto.dart';
+import 'package:geschool/features/common/data/dto/add_budget_dto.dart';
 import 'package:geschool/features/common/data/dto/add_note_dto.dart';
 import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/apprenant_eval_dto.dart';
@@ -21,6 +22,7 @@ import 'package:geschool/features/common/data/models/respmodels/affectation_list
 import 'package:geschool/features/common/data/models/respmodels/app_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/apprenant_eval_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/apprenant_list_response_model.dart';
+import 'package:geschool/features/common/data/models/respmodels/budget_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/bulletin_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/centre_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/classe_eleve_list_response_model.dart';
@@ -90,12 +92,9 @@ abstract class Api {
 
   Future<Either<Failure, OkResponseModel>> sendNotes(AddNoteDto addNoteDto);
 
-/* List end */
-
   Future<Either<Failure, AffectationListResponseModel>> getAffectations(
       GetInfoDto infoDto);
 
-/* List end */
   Future<Either<Failure, CentreResponseModel>> getCentre(GetInfoDto infoDto);
 
   Future<Either<Failure, ConduiteListResponseModel>> getConduites(
@@ -126,6 +125,14 @@ abstract class Api {
   Future<Either<Failure, ApprenantListResponseModel>> getAprenants(
       GetInfoDto infoDto);
 /* Permission apprenant end */
+
+/* Budget deb */
+  Future<Either<Failure, BudgetListResponseModel>> getBudgets(
+      GetInfoDto infoDto);
+  Future<Either<Failure, OkResponseModel>> sendBudget(AddBudgetDto infoDto);
+  Future<Either<Failure, BudgetListResponseModel>> validateBudget(
+      GetInfoDto infoDto);
+/* Budget end */
 
 /* End */
 }

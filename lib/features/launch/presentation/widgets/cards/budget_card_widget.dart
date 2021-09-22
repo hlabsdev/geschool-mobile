@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
+import 'package:geschool/features/common/data/function_utils.dart';
+import 'package:geschool/features/common/data/models/basemodels/detail_budget_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/launch/presentation/pages/budget/detail_budget.dart';
@@ -13,7 +14,7 @@ class BudgetCardWidget extends StatelessWidget {
   }) : super(key: key);
 
   // final bool isAdmin;
-  final PermissionApprenantModel budget;
+  final DetailBudgetModel budget;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class BudgetCardWidget extends StatelessWidget {
           width: (MediaQuery.of(context).size.width / 2),
           // Date
           child: Text(
-            budget.datedemandepermission,
+            FunctionUtils.convertFormatDate(budget.dateOperation),
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class BudgetCardWidget extends StatelessWidget {
                       constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width / 3),
                       child: Text(
-                        (budget.motifpermission),
+                        (budget.natureFondLibelle),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -99,7 +100,7 @@ class BudgetCardWidget extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     // Somme
                     child: Text(
-                      (budget.heurefinpermission),
+                      (budget.montantOperation),
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,

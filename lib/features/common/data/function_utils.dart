@@ -648,7 +648,15 @@ class FunctionUtils {
   }
 
   /// get center id
+  static String getCenterKey(String name, List<CentreModel> centres) {
+    String key;
+    key = centres
+        .firstWhere((element) => element.denominationCenter == name)
+        .keyCenter;
+    return key;
+  }
 
+  /// get center id
   static int getCenterId(String name, List<CentreModel> centres) {
     int id;
     id = centres
@@ -657,7 +665,16 @@ class FunctionUtils {
     return id;
   }
 
-  /// get center name
+  /// get center name by key
+  static String getCenterNameByKey(String key, List<CentreModel> centres) {
+    String name;
+    name = centres
+        .firstWhere((element) => element.keyCenter == key)
+        .denominationCenter;
+    return name;
+  }
+
+  /// get center name by id
   static String getCenterName(int id, List<CentreModel> centres) {
     String name;
     name = centres

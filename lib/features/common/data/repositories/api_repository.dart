@@ -11,6 +11,7 @@ import 'package:geschool/core/utils/data_constantes_utils.dart';
 import 'package:geschool/core/utils/preference.dart';
 import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/add_abs_dto.dart';
+import 'package:geschool/features/common/data/dto/add_budget_dto.dart';
 import 'package:geschool/features/common/data/dto/add_note_dto.dart';
 import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/apprenant_eval_dto.dart';
@@ -31,6 +32,7 @@ import 'package:geschool/features/common/data/models/respmodels/affectation_list
 import 'package:geschool/features/common/data/models/respmodels/app_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/apprenant_eval_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/apprenant_list_response_model.dart';
+import 'package:geschool/features/common/data/models/respmodels/budget_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/bulletin_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/centre_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/classe_eleve_list_response_model.dart';
@@ -1168,6 +1170,79 @@ class ApiRepository implements Api {
         Map<String, dynamic> responseMap = jsonDecode(data);
 
         return Right((ApprenantListResponseModel.fromJson(responseMap)));
+      } on DioError catch (ex) {
+        if (ex.type == DioErrorType.CONNECT_TIMEOUT) {
+          throw Exception(allTranslations.text('connection_timeout'));
+        } else if (ex.type == DioErrorType.RECEIVE_TIMEOUT) {
+          throw Exception(allTranslations.text('receive_timeout'));
+        } else if (ex.type == DioErrorType.RESPONSE) {
+          throw Exception(allTranslations.text('server_incorrect'));
+        }
+        throw Exception(ex.message);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(CacheFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, BudgetListResponseModel>> getBudgets(
+      GetInfoDto infoDto) async {
+    if (await networkInfo.isConnected) {
+      try {
+        var finalUrl = (defaultServer.toString() +
+                DataConstantesUtils.ALL_BUDGETS_SERVER_URL.toString())
+            .toString();
+        var accesToken = DataConstantesUtils.SERVER_TOKEN;
+        infoDto.accessToken = accesToken;
+        FormData formData = new FormData.fromMap(infoDto.toJson());
+        var response = await dio.post(finalUrl, data: formData);
+        var data = response.data;
+        Map<String, dynamic> responseMap = jsonDecode(data);
+
+        return Right((BudgetListResponseModel.fromJson(responseMap)));
+      } on DioError catch (ex) {
+        if (ex.type == DioErrorType.CONNECT_TIMEOUT) {
+          throw Exception(allTranslations.text('connection_timeout'));
+        } else if (ex.type == DioErrorType.RECEIVE_TIMEOUT) {
+          throw Exception(allTranslations.text('receive_timeout'));
+        } else if (ex.type == DioErrorType.RESPONSE) {
+          throw Exception(allTranslations.text('server_incorrect'));
+        }
+        throw Exception(ex.message);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(CacheFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, BudgetListResponseModel>> validateBudget(
+      GetInfoDto infoDto) {
+    // TODO: implement sendBudget
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, OkResponseModel>> sendBudget(
+      AddBudgetDto infoDto) async {
+    if (await networkInfo.isConnected) {
+      try {
+        var finalUrl = (defaultServer.toString() +
+                DataConstantesUtils.NEW_BUDGET_URL.toString())
+            .toString();
+        var accesToken = DataConstantesUtils.SERVER_TOKEN;
+        infoDto.accessToken = accesToken;
+        FormData formData = new FormData.fromMap(infoDto.toJson());
+        var response = await dio.post(finalUrl, data: formData);
+        var data = response.data;
+        Map<String, dynamic> responseMap = jsonDecode(data);
+
+        return Right((OkResponseModel.fromJson(responseMap)));
       } on DioError catch (ex) {
         if (ex.type == DioErrorType.CONNECT_TIMEOUT) {
           throw Exception(allTranslations.text('connection_timeout'));

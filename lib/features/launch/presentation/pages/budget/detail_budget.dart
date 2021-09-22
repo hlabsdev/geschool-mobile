@@ -9,6 +9,7 @@ import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
+import 'package:geschool/features/common/data/models/basemodels/detail_budget_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
@@ -17,7 +18,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 // ignore: must_be_immutable
 class DetailBudget extends StatefulWidget {
-  PermissionApprenantModel budget;
+  DetailBudgetModel budget;
   UserModel me;
   List<ApprenantModel> apprenants;
   List<CentreModel> centres;
@@ -52,9 +53,9 @@ class _DetailBudgetState extends State<DetailBudget> {
 
   @override
   void initState() {
-    validateDto.idCenter = widget.budget.idCenter;
+    // validateDto.idCenter = widget.budget.idCenter;
     validateDto.uIdentifiant = widget.me.authKey;
-    validateDto.permissionKey = widget.budget.keypermission;
+    // validateDto.permissionKey = widget.budget.keypermission;
     validateDto.registrationId = "";
     // Perm
     addPermDto.uIdentifiant = widget.me.authKey;
@@ -106,7 +107,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                   subtitle: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Text(
-                      (widget.budget.nom + " " + widget.budget.prenoms) ??
+                      widget.budget.nomPrenom ??
                           allTranslations.text('not_defined'),
                       style: TextStyle(
                         fontSize: 14,
@@ -133,7 +134,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                     // textAlign: TextAlign.justify,
                   ),
                   subtitle: ExpandableText(
-                      widget.budget.motifpermission ??
+                      widget.budget.description ??
                           allTranslations.text('not_defined'),
                       "Description"),
                   isThreeLine: true,
@@ -176,7 +177,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                     DataCell(
                       Text(
                         FunctionUtils.convertFormatDate(
-                            widget.budget.datedemandepermission),
+                            widget.budget.dateOperation),
                         style: TextStyle(
                           fontSize: 14,
                         ),
@@ -184,7 +185,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                     ),
                     DataCell(
                       Text(
-                        widget.budget.heuredebutpermission,
+                        widget.budget.natureFondLibelle,
                         style: TextStyle(
                           fontSize: 12,
                         ),
@@ -192,7 +193,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                     ),
                     DataCell(
                       Text(
-                        widget.budget.datedebutpermission,
+                        widget.budget.montantOperation,
                         style: TextStyle(
                           fontSize: 12,
                         ),
