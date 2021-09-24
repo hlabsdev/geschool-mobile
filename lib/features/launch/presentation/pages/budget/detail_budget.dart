@@ -1,20 +1,16 @@
-import 'package:date_time_picker/date_time_picker.dart';
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
-import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:geschool/allTranslations.dart';
 import 'package:geschool/core/utils/colors.dart';
-import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/detail_budget_model.dart';
-import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
-import 'package:geschool/features/common/data/repositories/api_repository.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_text.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 // ignore: must_be_immutable
 class DetailBudget extends StatefulWidget {

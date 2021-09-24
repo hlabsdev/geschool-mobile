@@ -1,8 +1,10 @@
+import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
+
 class DepenseListResponseModel {
   String status;
   String message;
   int isAdmin;
-  List<Information> information;
+  List<DenpensePerCentre> information;
 
   DepenseListResponseModel(
       {this.status, this.message, this.isAdmin, this.information});
@@ -14,7 +16,7 @@ class DepenseListResponseModel {
     this.information = json["information"] == null
         ? null
         : (json["information"] as List)
-            .map((e) => Information.fromJson(e))
+            .map((e) => DenpensePerCentre.fromJson(e))
             .toList();
   }
 
@@ -29,7 +31,7 @@ class DepenseListResponseModel {
   }
 }
 
-class Information {
+class DenpensePerCentre {
   String keyCenter;
   String centreName;
   int budgetRecu;
@@ -37,9 +39,9 @@ class Information {
   int budgetPrevision;
   int budgetPlafond;
   int budgetDepense;
-  Datas datas;
+  DenpenseCentreDatas datas;
 
-  Information({
+  DenpensePerCentre({
     this.keyCenter,
     this.centreName,
     this.budgetRecu,
@@ -50,7 +52,7 @@ class Information {
     this.datas,
   });
 
-  Information.fromJson(Map<String, dynamic> json) {
+  DenpensePerCentre.fromJson(Map<String, dynamic> json) {
     this.keyCenter = json["key_center"];
     this.centreName = json["centre_name"];
     this.budgetRecu = json["budget_recu"];
@@ -58,7 +60,9 @@ class Information {
     this.budgetPrevision = json["budget_prevision"];
     this.budgetPlafond = json["budget_plafond"];
     this.budgetDepense = json["budget_depense"];
-    this.datas = json["datas"] == null ? null : Datas.fromJson(json["datas"]);
+    this.datas = json["datas"] == null
+        ? null
+        : DenpenseCentreDatas.fromJson(json["datas"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -75,14 +79,14 @@ class Information {
   }
 }
 
-class Datas {
+class DenpenseCentreDatas {
   List<Sections> sections;
   List<AllPersonnels> allPersonnels;
-  List<Data1> data1;
-  List<Data2> data2;
-  List<Data3> data3;
+  List<DepenseModel> data1;
+  List<DepenseModel> data2;
+  List<DepenseModel> data3;
 
-  Datas({
+  DenpenseCentreDatas({
     this.sections,
     this.allPersonnels,
     this.data1,
@@ -90,7 +94,7 @@ class Datas {
     this.data3,
   });
 
-  Datas.fromJson(Map<String, dynamic> json) {
+  DenpenseCentreDatas.fromJson(Map<String, dynamic> json) {
     this.sections = json["sections"] == null
         ? null
         : (json["sections"] as List).map((e) => Sections.fromJson(e)).toList();
@@ -101,13 +105,13 @@ class Datas {
             .toList();
     this.data1 = json["data1"] == null
         ? null
-        : (json["data1"] as List).map((e) => Data1.fromJson(e)).toList();
+        : (json["data1"] as List).map((e) => DepenseModel.fromJson(e)).toList();
     this.data2 = json["data2"] == null
         ? null
-        : (json["data2"] as List).map((e) => Data2.fromJson(e)).toList();
+        : (json["data2"] as List).map((e) => DepenseModel.fromJson(e)).toList();
     this.data3 = json["data3"] == null
         ? null
-        : (json["data3"] as List).map((e) => Data3.fromJson(e)).toList();
+        : (json["data3"] as List).map((e) => DepenseModel.fromJson(e)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -123,336 +127,6 @@ class Datas {
       data["data2"] = this.data2.map((e) => e.toJson()).toList();
     if (this.data3 != null)
       data["data3"] = this.data3.map((e) => e.toJson()).toList();
-    return data;
-  }
-}
-
-class Data3 {
-  String id;
-  String idsection;
-  String iduser;
-  String keydepense;
-  String datedemande;
-  String motifdemande;
-  String montantdepense;
-  dynamic datedepense;
-  String description;
-  dynamic referencetransaction;
-  String status;
-  String createdAt;
-  String updatedAt;
-  String createBy;
-  String updatedBy;
-  String datetraitement;
-  String idcentre;
-  dynamic motifsuppression;
-  String idannee;
-  String keypersonnel;
-  String nom;
-  String prenoms;
-  String keysection;
-  String designation;
-
-  Data3({
-    this.id,
-    this.idsection,
-    this.iduser,
-    this.keydepense,
-    this.datedemande,
-    this.motifdemande,
-    this.montantdepense,
-    this.datedepense,
-    this.description,
-    this.referencetransaction,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-    this.createBy,
-    this.updatedBy,
-    this.datetraitement,
-    this.idcentre,
-    this.motifsuppression,
-    this.idannee,
-    this.keypersonnel,
-    this.nom,
-    this.prenoms,
-    this.keysection,
-    this.designation,
-  });
-
-  Data3.fromJson(Map<String, dynamic> json) {
-    this.id = json["id"];
-    this.idsection = json["idsection"];
-    this.iduser = json["iduser"];
-    this.keydepense = json["keydepense"];
-    this.datedemande = json["datedemande"];
-    this.motifdemande = json["motifdemande"];
-    this.montantdepense = json["montantdepense"];
-    this.datedepense = json["datedepense"];
-    this.description = json["description"];
-    this.referencetransaction = json["referencetransaction"];
-    this.status = json["status"];
-    this.createdAt = json["created_at"];
-    this.updatedAt = json["updated_at"];
-    this.createBy = json["create_by"];
-    this.updatedBy = json["updated_by"];
-    this.datetraitement = json["datetraitement"];
-    this.idcentre = json["idcentre"];
-    this.motifsuppression = json["motifsuppression"];
-    this.idannee = json["idannee"];
-    this.keypersonnel = json["keypersonnel"];
-    this.nom = json["nom"];
-    this.prenoms = json["prenoms"];
-    this.keysection = json["keysection"];
-    this.designation = json["designation"];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data["id"] = this.id;
-    data["idsection"] = this.idsection;
-    data["iduser"] = this.iduser;
-    data["keydepense"] = this.keydepense;
-    data["datedemande"] = this.datedemande;
-    data["motifdemande"] = this.motifdemande;
-    data["montantdepense"] = this.montantdepense;
-    data["datedepense"] = this.datedepense;
-    data["description"] = this.description;
-    data["referencetransaction"] = this.referencetransaction;
-    data["status"] = this.status;
-    data["created_at"] = this.createdAt;
-    data["updated_at"] = this.updatedAt;
-    data["create_by"] = this.createBy;
-    data["updated_by"] = this.updatedBy;
-    data["datetraitement"] = this.datetraitement;
-    data["idcentre"] = this.idcentre;
-    data["motifsuppression"] = this.motifsuppression;
-    data["idannee"] = this.idannee;
-    data["keypersonnel"] = this.keypersonnel;
-    data["nom"] = this.nom;
-    data["prenoms"] = this.prenoms;
-    data["keysection"] = this.keysection;
-    data["designation"] = this.designation;
-    return data;
-  }
-}
-
-class Data2 {
-  String id;
-  String idsection;
-  String iduser;
-  String keydepense;
-  String datedemande;
-  String motifdemande;
-  String montantdepense;
-  dynamic datedepense;
-  dynamic description;
-  dynamic referencetransaction;
-  String status;
-  String createdAt;
-  String updatedAt;
-  String createBy;
-  String updatedBy;
-  String datetraitement;
-  String idcentre;
-  dynamic motifsuppression;
-  String idannee;
-  String keypersonnel;
-  String nom;
-  String prenoms;
-  String keysection;
-  String designation;
-
-  Data2({
-    this.id,
-    this.idsection,
-    this.iduser,
-    this.keydepense,
-    this.datedemande,
-    this.motifdemande,
-    this.montantdepense,
-    this.datedepense,
-    this.description,
-    this.referencetransaction,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-    this.createBy,
-    this.updatedBy,
-    this.datetraitement,
-    this.idcentre,
-    this.motifsuppression,
-    this.idannee,
-    this.keypersonnel,
-    this.nom,
-    this.prenoms,
-    this.keysection,
-    this.designation,
-  });
-
-  Data2.fromJson(Map<String, dynamic> json) {
-    this.id = json["id"];
-    this.idsection = json["idsection"];
-    this.iduser = json["iduser"];
-    this.keydepense = json["keydepense"];
-    this.datedemande = json["datedemande"];
-    this.motifdemande = json["motifdemande"];
-    this.montantdepense = json["montantdepense"];
-    this.datedepense = json["datedepense"];
-    this.description = json["description"];
-    this.referencetransaction = json["referencetransaction"];
-    this.status = json["status"];
-    this.createdAt = json["created_at"];
-    this.updatedAt = json["updated_at"];
-    this.createBy = json["create_by"];
-    this.updatedBy = json["updated_by"];
-    this.datetraitement = json["datetraitement"];
-    this.idcentre = json["idcentre"];
-    this.motifsuppression = json["motifsuppression"];
-    this.idannee = json["idannee"];
-    this.keypersonnel = json["keypersonnel"];
-    this.nom = json["nom"];
-    this.prenoms = json["prenoms"];
-    this.keysection = json["keysection"];
-    this.designation = json["designation"];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data["id"] = this.id;
-    data["idsection"] = this.idsection;
-    data["iduser"] = this.iduser;
-    data["keydepense"] = this.keydepense;
-    data["datedemande"] = this.datedemande;
-    data["motifdemande"] = this.motifdemande;
-    data["montantdepense"] = this.montantdepense;
-    data["datedepense"] = this.datedepense;
-    data["description"] = this.description;
-    data["referencetransaction"] = this.referencetransaction;
-    data["status"] = this.status;
-    data["created_at"] = this.createdAt;
-    data["updated_at"] = this.updatedAt;
-    data["create_by"] = this.createBy;
-    data["updated_by"] = this.updatedBy;
-    data["datetraitement"] = this.datetraitement;
-    data["idcentre"] = this.idcentre;
-    data["motifsuppression"] = this.motifsuppression;
-    data["idannee"] = this.idannee;
-    data["keypersonnel"] = this.keypersonnel;
-    data["nom"] = this.nom;
-    data["prenoms"] = this.prenoms;
-    data["keysection"] = this.keysection;
-    data["designation"] = this.designation;
-    return data;
-  }
-}
-
-class Data1 {
-  String id;
-  String idsection;
-  String iduser;
-  String keydepense;
-  String datedemande;
-  String motifdemande;
-  String montantdepense;
-  dynamic datedepense;
-  dynamic description;
-  dynamic referencetransaction;
-  String status;
-  String createdAt;
-  dynamic updatedAt;
-  String createBy;
-  dynamic updatedBy;
-  dynamic datetraitement;
-  String idcentre;
-  dynamic motifsuppression;
-  String idannee;
-  String keypersonnel;
-  String nom;
-  String prenoms;
-  String keysection;
-  String designation;
-
-  Data1({
-    this.id,
-    this.idsection,
-    this.iduser,
-    this.keydepense,
-    this.datedemande,
-    this.motifdemande,
-    this.montantdepense,
-    this.datedepense,
-    this.description,
-    this.referencetransaction,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-    this.createBy,
-    this.updatedBy,
-    this.datetraitement,
-    this.idcentre,
-    this.motifsuppression,
-    this.idannee,
-    this.keypersonnel,
-    this.nom,
-    this.prenoms,
-    this.keysection,
-    this.designation,
-  });
-
-  Data1.fromJson(Map<String, dynamic> json) {
-    this.id = json["id"];
-    this.idsection = json["idsection"];
-    this.iduser = json["iduser"];
-    this.keydepense = json["keydepense"];
-    this.datedemande = json["datedemande"];
-    this.motifdemande = json["motifdemande"];
-    this.montantdepense = json["montantdepense"];
-    this.datedepense = json["datedepense"];
-    this.description = json["description"];
-    this.referencetransaction = json["referencetransaction"];
-    this.status = json["status"];
-    this.createdAt = json["created_at"];
-    this.updatedAt = json["updated_at"];
-    this.createBy = json["create_by"];
-    this.updatedBy = json["updated_by"];
-    this.datetraitement = json["datetraitement"];
-    this.idcentre = json["idcentre"];
-    this.motifsuppression = json["motifsuppression"];
-    this.idannee = json["idannee"];
-    this.keypersonnel = json["keypersonnel"];
-    this.nom = json["nom"];
-    this.prenoms = json["prenoms"];
-    this.keysection = json["keysection"];
-    this.designation = json["designation"];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data["id"] = this.id;
-    data["idsection"] = this.idsection;
-    data["iduser"] = this.iduser;
-    data["keydepense"] = this.keydepense;
-    data["datedemande"] = this.datedemande;
-    data["motifdemande"] = this.motifdemande;
-    data["montantdepense"] = this.montantdepense;
-    data["datedepense"] = this.datedepense;
-    data["description"] = this.description;
-    data["referencetransaction"] = this.referencetransaction;
-    data["status"] = this.status;
-    data["created_at"] = this.createdAt;
-    data["updated_at"] = this.updatedAt;
-    data["create_by"] = this.createBy;
-    data["updated_by"] = this.updatedBy;
-    data["datetraitement"] = this.datetraitement;
-    data["idcentre"] = this.idcentre;
-    data["motifsuppression"] = this.motifsuppression;
-    data["idannee"] = this.idannee;
-    data["keypersonnel"] = this.keypersonnel;
-    data["nom"] = this.nom;
-    data["prenoms"] = this.prenoms;
-    data["keysection"] = this.keysection;
-    data["designation"] = this.designation;
     return data;
   }
 }

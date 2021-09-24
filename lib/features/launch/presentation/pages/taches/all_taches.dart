@@ -1,7 +1,6 @@
-import 'package:date_picker_timeline/date_picker_timeline.dart';
+import 'package:calendar_timeline/calendar_timeline.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geschool/allTranslations.dart';
 import 'package:geschool/core/utils/colors.dart';
@@ -31,7 +30,6 @@ class AllTasks extends StatefulWidget {
 }
 
 class _AllTasksState extends State<AllTasks> {
-  final _datePickerKey = GlobalKey();
   final formKey = GlobalKey<FormState>();
   final _rappelFormKey = GlobalKey<FormState>();
   final _rapportFormKey = GlobalKey<FormState>();
@@ -47,7 +45,6 @@ class _AllTasksState extends State<AllTasks> {
   Animation<double> rotationAnimation;
   Icon arrowLeft = Icon(Icons.keyboard_arrow_left_rounded);
   String sousTitreChecbox;
-  SlidableController slidableController;
   TextEditingController _centreController = TextEditingController();
   TextEditingController _personnelController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
@@ -56,10 +53,12 @@ class _AllTasksState extends State<AllTasks> {
   TextEditingController _rapportController = TextEditingController();
   TextEditingController centreController = TextEditingController(text: "");
   TextEditingController userController = TextEditingController(text: "");
+  SlidableController slidableController;
   GetInfoDto infoDto = GetInfoDto();
   TacheDto tacheDto = TacheDto();
   String errorMsg = "Test";
 
+  DateTime _selectedDay;
   bool isFormError = false;
 
   @override
@@ -69,6 +68,7 @@ class _AllTasksState extends State<AllTasks> {
     infoDto.uIdentifiant = widget.me.authKey;
     infoDto.registrationId = "";
     FunctionUtils.sortTaches(widget.taches);
+    _selectedDay = DateTime.now();
     getCentre();
     getUsers();
     filterTache(null);
@@ -78,6 +78,9 @@ class _AllTasksState extends State<AllTasks> {
     );
     isLoading = false;
     super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   dp.animateToDate(DateTime.now());
+    // });
   }
 
   @override
@@ -92,7 +95,6 @@ class _AllTasksState extends State<AllTasks> {
           color: Colors.white,
         ),
         tooltip: allTranslations.text('update'),
-        backgroundColor: GreenLight,
       ),
       appBar: AppBar(
         title: Text(allTranslations.text('all_tasks')),
@@ -127,18 +129,28 @@ class _AllTasksState extends State<AllTasks> {
             Card(
               margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
               color: Colors.yellow[200],
-              child: DatePicker(
-                // DateTime.now().subtract(Duration(days: 3)),
-                DateTime.now().subtract(Duration(days: 100)),
-                key: _datePickerKey,
-                daysCount: 500,
-                initialSelectedDate: DateTime.now(),
-                locale: "fr-FR",
-                selectionColor: Colors.grey[700],
-                selectedTextColor: Colors.white,
-                onDateChange: (date) {
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: CalendarTimeline(
+                initialDate: _selectedDay,
+                firstDate: DateTime.now().subtract(Duration(days: 1000)),
+                lastDate: DateTime.now().add(Duration(days: 1000)),
+                dayNameColor: Colors.black,
+                onDateSelected: (date) {
+                  print(date);
+                  setState(() {
+                    _selectedDay = date;
+                  });
                   filterTache(date);
                 },
+                leftMargin: 20,
+                monthColor: Colors.blueGrey,
+                dayColor: Colors.black,
+                activeDayColor: Colors.white,
+                activeBackgroundDayColor: Grey,
+                dotsColor: Color(0xFF333A47),
+                locale: 'fr',
               ),
             ),
             /* Filtre par centre et personnel deb */
@@ -166,7 +178,8 @@ class _AllTasksState extends State<AllTasks> {
                               : Text(FunctionUtils.getCenterName(
                                   int.parse(centreController.text), centres)),
                           onChanged: (value) {
-                            filterPerCentre(getCenterId(value));
+                            filterPerCentre(
+                                FunctionUtils.getCenterId(value, centres));
                             setState(() {
                               centreController.text =
                                   FunctionUtils.getCenterId(value, centres)
@@ -189,20 +202,25 @@ class _AllTasksState extends State<AllTasks> {
                           isExpanded: true,
                           items: personnelsFilter
                               .map((perso) => DropdownMenuItem(
-                                    child: Text(
-                                        getPersonnelName(perso.keypersonnel)),
+                                    child: Text(FunctionUtils.getPersonnelName(
+                                        perso.keypersonnel, personnels)),
                                     // value: perso.keypersonnel,
-                                    value: getPersonnelName(perso.keypersonnel),
+                                    value: FunctionUtils.getPersonnelName(
+                                        perso.keypersonnel, personnels),
                                     onTap: () => print(perso.keypersonnel),
                                   ))
                               .toList(),
                           hint: userController.text == ""
                               ? Text("Personnel")
-                              : Text(getPersonnelName(userController.text)),
+                              : Text(FunctionUtils.getPersonnelName(
+                                  userController.text, personnels)),
                           onChanged: (value) {
                             setState(() {
                               !value.isEmpty
-                                  ? userController.text = getPersonnelKey(value)
+                                  ? userController.text =
+                                      FunctionUtils.getPersonnelKey(
+                                          value, personnels)
+                                  // ignore: unnecessary_statements
                                   : null;
                             });
                             print(
@@ -529,9 +547,11 @@ class _AllTasksState extends State<AllTasks> {
   void filterTache(DateTime date) {
     setState(() {
       if (date != null) {
+        var taskdate = date.toString().split(" ")[0];
+        print(taskdate);
         tachesFilter.clear();
         tachesFilter = widget.taches
-            .filter((task) => DateTime.parse(task.dateTache) == date)
+            .filter((task) => task.dateTache.split(" ")[0] == (taskdate))
             .toList();
         allChk = false;
         // FunctionUtils.sortTaches(tachesFilter);
@@ -581,46 +601,6 @@ class _AllTasksState extends State<AllTasks> {
 
   void listAll() {
     allChk == true ? filterTache(null) : filterTache(DateTime.now());
-  }
-
-  int getCenterId(String name) {
-    int id;
-    id = centres
-        .firstWhere((element) => element.denominationCenter == name)
-        .idCenter;
-    return id;
-  }
-
-  String getCenterName(int id) {
-    String name;
-    name = centres
-        .firstWhere((element) => element.idCenter == id)
-        .denominationCenter;
-    return name;
-  }
-
-  getPersonnelName(String key) {
-    String name;
-    PersonnelTache perso = PersonnelTache();
-    perso = personnels.firstWhere((element) => element.keypersonnel == key,
-        orElse: () => null);
-    name = "${perso.nom} ${perso.prenoms}";
-    return name;
-  }
-
-  String getPersonnelKey(String name) {
-    String key;
-    PersonnelTache perso = PersonnelTache();
-    if (!name.isEmptyOrNull) {
-      perso = personnels.firstWhere(
-        (element) =>
-            (element.nom + " " + element.prenoms).toLowerCase() ==
-            name.toLowerCase(),
-        orElse: () => null,
-      );
-      key = perso.keypersonnel;
-    }
-    return key;
   }
 
   void showAddForm(TacheModel tache) {
@@ -678,7 +658,7 @@ class _AllTasksState extends State<AllTasks> {
       key: formKey,
       child: Column(
         children: <Widget>[
-          isFormError
+          /* isFormError
               ? Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5)),
@@ -692,7 +672,7 @@ class _AllTasksState extends State<AllTasks> {
                             style: TextStyle(color: Colors.white))),
                   ),
                 )
-              : SizedBox(height: 0),
+              : SizedBox(height: 0), */
           // SizedBox(height: 10.0),
           Container(
               margin: EdgeInsets.only(top: 10.0, bottom: 15),
@@ -710,13 +690,15 @@ class _AllTasksState extends State<AllTasks> {
                               .toList(),
                           hint: _centreController.text == ""
                               ? Text("Centre")
-                              : Text(getCenterName(
-                                  int.parse(_centreController.text))),
+                              : Text(FunctionUtils.getCenterName(
+                                  int.parse(_centreController.text), centres)),
                           onChanged: (value) {
-                            filterPerCentre(getCenterId(value));
+                            filterPerCentre(
+                                FunctionUtils.getCenterId(value, centres));
                             setState(() {
                               _centreController.text =
-                                  getCenterId(value).toString();
+                                  FunctionUtils.getCenterId(value, centres)
+                                      .toString();
                             });
                           },
                         ).py12()
@@ -727,21 +709,26 @@ class _AllTasksState extends State<AllTasks> {
                     // items: personnelsFilter
                     items: personnelsFilter
                         .map((perso) => DropdownMenuItem(
-                              child: Text(getPersonnelName(perso.keypersonnel)),
+                              child: Text(FunctionUtils.getPersonnelName(
+                                  perso.keypersonnel, personnels)),
                               // value: perso.keypersonnel,
-                              value: getPersonnelName(perso.keypersonnel),
+                              value: FunctionUtils.getPersonnelName(
+                                  perso.keypersonnel, personnels),
                               onTap: () => print(perso.keypersonnel),
                             ))
                         .toList(),
                     hint: _personnelController.text == ""
                         ? Text("Personnel")
-                        : Text(getPersonnelName(_personnelController.text)),
+                        : Text(FunctionUtils.getPersonnelName(
+                            _personnelController.text, personnels)),
                     onChanged: (value) {
                       setState(() {
                         value.isEmpty
+                            // ignore: unnecessary_statements
                             ? null
                             : _personnelController.text =
-                                getPersonnelKey(value);
+                                FunctionUtils.getPersonnelKey(
+                                    value, personnels);
                       });
                     },
                   ).py12(),
@@ -880,33 +867,6 @@ class _AllTasksState extends State<AllTasks> {
     sendTache();
     tachesFilter.clear();
     tachesFilter.addAll(widget.taches);
-  }
-
-  confirmDeleteTask(BuildContext context, TacheModel tache) {
-    showPlatformDialog(
-      context: context,
-      builder: (_) => BasicDialogAlert(
-        title: Text(allTranslations.text('confirm_delete')),
-        content: Text(allTranslations.text('delete_message_task')),
-        actions: <Widget>[
-          TextButton(
-            child: Text("Annuler"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: Text("Valider"),
-            onPressed: () {
-              setState(() {
-                tachesFilter.remove(tache);
-                tachesFilter.remove(tache);
-              });
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   void _moreAction(context, TacheModel tache) {
@@ -1150,7 +1110,8 @@ class _AllTasksState extends State<AllTasks> {
       tacheDto.description = tache.descriptionTache;
       tacheDto.idCentre = tache.idCentre;
       tacheDto.uIdentifiant = widget.me.authKey;
-      tacheDto.pIdentifiant = getPersonnelKey(tache.nameUser);
+      tacheDto.pIdentifiant =
+          FunctionUtils.getPersonnelKey(tache.nameUser, personnels);
       // clearController();
     });
     print(tacheDto.toJson());
@@ -1172,7 +1133,8 @@ class _AllTasksState extends State<AllTasks> {
       tacheDto.description = tache.descriptionTache;
       tacheDto.idCentre = tache.idCentre;
       tacheDto.uIdentifiant = widget.me.authKey;
-      tacheDto.pIdentifiant = getPersonnelKey(tache.nameUser);
+      tacheDto.pIdentifiant =
+          FunctionUtils.getPersonnelKey(tache.nameUser, personnels);
       // clearController();
     });
     print(tacheDto.toJson());

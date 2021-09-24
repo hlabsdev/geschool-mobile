@@ -7,17 +7,21 @@ import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/get_info_dto.dart';
-import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
+import 'package:geschool/features/common/data/dto/validate_depense_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
+import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
+import 'package:geschool/features/common/data/models/respmodels/centre_response_model.dart';
+import 'package:geschool/features/common/data/models/respmodels/depense_list_response_model.dart';
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
 import 'package:geschool/features/launch/presentation/pages/depense/detail_depense.dart';
-import 'package:geschool/features/launch/presentation/widgets/budget_chart.dart';
+import 'package:geschool/features/launch/presentation/widgets/data_chart.dart';
 import 'package:geschool/features/launch/presentation/widgets/cards/depense_card_widget.dart';
-import 'package:geschool/features/launch/presentation/widgets/cards/permission_apprenant_card_widget_card.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:geschool/features/launch/presentation/widgets/decorations/refreshable_widget.dart';
+import 'package:geschool/features/launch/presentation/widgets/filter_pane_widget.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -33,6 +37,8 @@ class AllDepenses extends StatefulWidget {
 class _AllDepensesState extends State<AllDepenses> {
   GetInfoDto infoDto = GetInfoDto();
   TextEditingController centreController = TextEditingController();
+  TextEditingController sectionController = TextEditingController();
+  TextEditingController personnelController = TextEditingController();
   bool allChk = false;
 
   bool isLoading;
@@ -46,12 +52,17 @@ class _AllDepensesState extends State<AllDepenses> {
 
   /* Imported prepared for parsing deb */
 
-  List<PermissionApprenantModel> information = [];
-  List<PermissionApprenantModel> permissionFilter = [];
+  List<DenpensePerCentre> informationPerCentre = [];
+  // List<DenpenseCentreDatas> information = [];
+  // List<DenpenseCentreDatas> infoFilter = [];
+  DenpensePerCentre information = new DenpensePerCentre();
+  DenpensePerCentre infoFilter = new DenpensePerCentre();
   List<CentreModel> centres = [];
-  List<PermissionApprenantModel> attente = [];
-  List<PermissionApprenantModel> acordee = [];
-  List<PermissionApprenantModel> noacordee = [];
+  List<DepenseModel> attente = [];
+  List<DepenseModel> decaissement = [];
+  List<DepenseModel> refus = [];
+  List<AllPersonnels> personnels = [];
+  List<Sections> sections = [];
 
   /* For form deb */
   TextEditingController _centreController = TextEditingController();
@@ -70,7 +81,7 @@ class _AllDepensesState extends State<AllDepenses> {
   SlidableController slidableController;
   Icon _arrowLeft = Icon(Icons.keyboard_arrow_left_rounded);
   Animation<double> rotationAnimation;
-  ValidatePermDto validateDto = ValidatePermDto();
+  ValidateDepenseDto validateDto = ValidateDepenseDto();
   AddPermissionDto addPermDto = AddPermissionDto();
   final formKey = GlobalKey<FormState>();
 
@@ -83,16 +94,21 @@ class _AllDepensesState extends State<AllDepenses> {
   void initState() {
     infoDto.uIdentifiant = widget.me.authKey;
     infoDto.registrationId = "";
+    information.budgetDepense = 0;
+    information.budgetPlafond = 0;
+    information.budgetPrevision = 0;
+    information.budgetRecu = 0;
+    information.totalDepense = 0;
     getInfos();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> etatPermission = [
+    List<dynamic> etatDepense = [
       ["Demandes en attentes", attente, Colors.grey[300]],
-      ["Demandes en cours de décaissements", acordee, Colors.green[100]],
-      ["Demandes Traitées", noacordee, Colors.red[100]],
+      ["Demandes en cours de décaissements", decaissement, Colors.green[100]],
+      ["Demandes Traitées", refus, Colors.red[100]],
     ];
     return Scaffold(
       appBar: AppBar(
@@ -118,81 +134,55 @@ class _AllDepensesState extends State<AllDepenses> {
         onRefresh: getInfos,
         isLoading: isLoading,
         error: error,
-        information: information,
+        information: informationPerCentre,
         noDataText: Text(allTranslations.text('no_budget')),
         child: ListView(
           padding: EdgeInsets.only(top: 15, bottom: 15),
           children: <Widget>[
             /* Filtre par centre et personnel deb */
-            // Container(
-            //   padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10),
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Row(
-            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //         children: [
-            //           Container(
-            //             width: (MediaQuery.of(context).size.width / 2.3),
-            //             child: SearchableDropdown(
-            //               closeButton: "Fermer",
-            //               isExpanded: true,
-            //               items: widget.centres
-            //                   .map((centre) => DropdownMenuItem(
-            //                         child: Text(centre),
-            //                         value: centre,
-            //                       ))
-            //                   .toList(),
-            //               hint: centreController.text == ""
-            //                   ? Text("Centre")
-            //                   : Text((centreController.text)),
-            //               onChanged: (value) {
-            //                 setState(() {
-            //                   centreController.text = value;
-            //                 });
-            //                 filterInfo(
-            //                   false,
-            //                   centreController.text,
-            //                 );
-            //               },
-            //             ),
-            //           ),
-            //           Container(
-            //             width: (MediaQuery.of(context).size.width / 2.3),
-            //             color: Colors.grey[100],
-            //             child: CheckboxListTile(
-            //               tristate: false,
-            //               secondary: const Text('Tout'),
-            //               // subtitle: Text(allTranslations.text('can_filter_per_date')),
-            //               value: allChk,
-            //               onChanged: (valueNew) {
-            //                 setState(() {
-            //                   allChk = valueNew;
-            //                   centreController.clear();
-            //                 });
-            //                 listAll();
-            //               },
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            SingleFilterPaneWidget(
+              hint: centreController.text == ""
+                  ? Text("Centre")
+                  : Text((centreController.text)),
+              isSearchable: false,
+              items: centres
+                  .map((centre) => DropdownMenuItem(
+                        child: Text(centre.denominationCenter),
+                        value: centre.keyCenter,
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  centreController.text = value;
+                });
+                filterInfo(
+                  false,
+                  centreController.text,
+                );
+              },
+              onChecked: (valueNew) {
+                setState(() {
+                  allChk = valueNew;
+                  centreController.clear();
+                });
+              },
+              listAll: () => listAll(),
+            ),
+            SizedBox(height: 5),
             /* Filtre par centre et personnel end */
             /* ====== Exnasion de liste de depenses  deb*/
 
             ListView.builder(
               shrinkWrap: true,
               primary: false,
-              // itemCount: permissionFilter.length,
+              // itemCount: infoFilter.length,
               // itemBuilder: (context, i) {
-              itemCount: etatPermission.length,
+              itemCount: etatDepense.length,
               itemBuilder: (context, index) {
-                List<dynamic> curentperm = etatPermission[index];
+                List<dynamic> curentDepense = etatDepense[index];
                 return ExpansionTile(
-                  collapsedBackgroundColor: curentperm[2],
-                  backgroundColor: curentperm[2],
+                  collapsedBackgroundColor: curentDepense[2],
+                  backgroundColor: curentDepense[2],
                   initiallyExpanded: index == selected,
                   onExpansionChanged: (value) {
                     if (value)
@@ -206,22 +196,21 @@ class _AllDepensesState extends State<AllDepenses> {
                       });
                   },
                   title: Container(
-                    // margin: EdgeInsets.symmetric(horizontal: 20.0),
                     height: 40,
                     decoration: BoxDecoration(
-                      color: curentperm[2],
+                      color: curentDepense[2],
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      curentperm[0].toUpperCase(),
+                      curentDepense[0].toUpperCase(),
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                   children: List.generate(
-                      curentperm[1].length,
+                      curentDepense[1].length,
                       (i) => Slidable(
                             controller: slidableController,
                             actionPane: SlidableDrawerActionPane(),
@@ -237,20 +226,21 @@ class _AllDepensesState extends State<AllDepenses> {
                                       builder: (BuildContext context) =>
                                           DetailDepense(
                                         me: widget.me,
-                                        depense: curentperm[1][i],
+                                        depense: curentDepense[1][i],
                                       ),
                                     ),
                                   );
                                 },
                               ),
-                              curentperm[1][i].status == "2"
+                              curentDepense[1][i].status == "2"
                                   ? SizedBox(height: 0, width: 0)
                                   : IconSlideAction(
                                       caption: 'Plus',
                                       color: GreenLight,
                                       icon: Icons.edit,
                                       onTap: () {
-                                        _moreAction(context, curentperm[1][i]);
+                                        _moreAction(
+                                            context, curentDepense[1][i]);
                                       },
                                     ),
                             ],
@@ -262,12 +252,15 @@ class _AllDepensesState extends State<AllDepenses> {
                                     builder: (BuildContext context) =>
                                         DetailDepense(
                                       me: widget.me,
-                                      depense: curentperm[1][i],
+                                      section: sections.firstWhere((sect) =>
+                                          sect.keysection ==
+                                          curentDepense[1][i].keysection),
+                                      depense: curentDepense[1][i],
                                     ),
                                   ),
                                 );
                               },
-                              depense: curentperm[1][i],
+                              depense: curentDepense[1][i],
                               trailing: _arrowLeft,
                             ),
                           ),
@@ -290,12 +283,14 @@ class _AllDepensesState extends State<AllDepenses> {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             ),
+            SizedBox(height: 20, width: 0),
             Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width - 50,
-                maxHeight: MediaQuery.of(context).size.height / 2 - 30,
+                maxWidth: MediaQuery.of(context).size.width - 30,
+                maxHeight: MediaQuery.of(context).size.height / 2,
               ),
-              child: SimpleBarChart.withSampleData(),
+              // child: SimpleBarChart.withSampleData(),
+              child: buildGraph(),
             ),
             /* ===== Graphe end */
           ],
@@ -310,60 +305,133 @@ class _AllDepensesState extends State<AllDepenses> {
     });
   }
 
-  void separate(List<PermissionApprenantModel> allList) {
+  void separate(DenpensePerCentre allList) {
     setState(() {
       attente.clear();
-      acordee.clear();
-      noacordee.clear();
-      attente = allList.where((element) => element.status == "0").toList();
-      acordee = allList.where((element) => element.status == "1").toList();
-      noacordee = allList.where((element) => element.status == "2").toList();
+      decaissement.clear();
+      refus.clear();
+      // for (var item in allList) {
+      attente.addAll(allList.datas.data1);
+      decaissement.addAll(allList.datas.data2);
+      refus.addAll(allList.datas.data3);
+      // }
+      attente.sort((a, b) => DateTime.tryParse(b.datedemande)
+          .compareTo(DateTime.tryParse(a.datedemande)));
+      decaissement.sort((a, b) => DateTime.tryParse(b.datedemande)
+          .compareTo(DateTime.tryParse(a.datedemande)));
+      refus.sort((a, b) => DateTime.tryParse(b.datedemande)
+          .compareTo(DateTime.tryParse(a.datedemande)));
+      personnels = allList.datas.allPersonnels;
+      sections = allList.datas.sections;
     });
   }
 
-  void getInfos() {
-    print("En recuperation...");
-    loading(true);
+  getInfos() {
     Api api = ApiRepository();
-    api.getPerms(infoDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de recuperes
-            setState(() {
-              information = a.information;
-              if (permissionFilter.length > 0) permissionFilter.clear();
-              permissionFilter.addAll(information);
-              allChk = true;
-              permissionFilter.sort((note1, note2) => note1
-                  .datedemandepermission
-                  .compareTo(note2.datedemandepermission));
-              separate(permissionFilter);
-            });
-            loading(false);
-            return true;
-          } else {
-            // Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message);
-            return false;
-          }
-        });
-      } else if (value.isLeft()) {
+    FunctionUtils.getData(
+      context: context,
+      dto: infoDto,
+      startFunction: () => loading(true),
+      stopFunction: () => loading(false),
+      repositoryFunction: api.getDepenses,
+      onFailure: (value) {
         setState(() {
-          error = true;
+          error = value;
         });
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    }, onError: (error) {
-      // Navigator.of(context).pop(null);
-      FunctionUtils.displaySnackBar(context, error.message);
-    });
+      },
+      onSuccess: (value) {
+        setState(() {
+          informationPerCentre = value.information;
+          information = new DenpensePerCentre(
+            budgetDepense: 0,
+            budgetPlafond: 0,
+            budgetPrevision: 0,
+            budgetRecu: 0,
+            totalDepense: 0,
+            datas: new DenpenseCentreDatas(
+              allPersonnels: [],
+              data1: [],
+              data2: [],
+              data3: [],
+              sections: [],
+            ),
+          );
+          infoFilter = new DenpensePerCentre();
+          //Ici toute
+          for (var denpensePerCentre in informationPerCentre) {
+            if (denpensePerCentre != null) {
+              // Variable uniques
+              information.budgetDepense +=
+                  denpensePerCentre?.budgetDepense ?? 0;
+              information.budgetPlafond +=
+                  denpensePerCentre?.budgetPlafond ?? 0;
+              information.budgetPrevision +=
+                  denpensePerCentre?.budgetPrevision ?? 0;
+              information.budgetRecu += denpensePerCentre?.budgetRecu ?? 0;
+              information.totalDepense += denpensePerCentre?.totalDepense ?? 0;
+              // Listes debut
+              information.datas.sections
+                  .addAll(denpensePerCentre.datas.sections);
+              information.datas.allPersonnels
+                  .addAll(denpensePerCentre.datas.allPersonnels);
+              information.datas.data1.addAll(denpensePerCentre.datas.data1);
+              information.datas.data2.addAll(denpensePerCentre.datas.data2);
+              information.datas.data3.addAll(denpensePerCentre.datas.data3);
+            }
+          }
+          infoFilter = information;
+          separate(infoFilter);
+          allChk = true;
+        });
+      },
+    );
+    getCentres();
+  }
+
+  getCentres() {
+    Api api = ApiRepository();
+    FunctionUtils.getData(
+      context: context,
+      dto: infoDto,
+      startFunction: () => loading(true),
+      stopFunction: () => loading(false),
+      repositoryFunction: api.getCentre,
+      onFailure: (value) {
+        setState(() {
+          error = value;
+        });
+      },
+      onSuccess: (CentreResponseModel value) {
+        setState(() {
+          centres.clear();
+          centres = value.information;
+        });
+      },
+    );
   }
 
   /// envoie des donnees de validation au serveur
-  validate(bool accorded) async {
+  validate(bool accorded, bool decaisser) {
+    setState(() {
+      if (decaisser) {
+        validateDto.operation = "3";
+      } else {
+        validateDto.operation = accorded ? "1" : "2";
+      }
+    });
+    Api api = ApiRepository();
+    FunctionUtils.sendData(
+        context: context,
+        dto: validateDto,
+        repositoryFunction: api.validateDepense,
+        clearController: clearController,
+        onSuccess: (a) {
+          getInfos();
+        },
+        onFailure: () {});
+  }
+
+  /* validate0(bool accorded) async {
     setState(() {
       validateDto.operation = accorded ? "1" : "2";
     });
@@ -414,8 +482,25 @@ class _AllDepensesState extends State<AllDepenses> {
         return false;
       }
     });
+  } */
+
+  sendDepense() {
+    Api api = ApiRepository();
+    FunctionUtils.sendData(
+        context: context,
+        // dto: budgetDto,
+        repositoryFunction: api.sendDepense,
+        clearController: clearController,
+        onSuccess: (a) {
+          ///On ferme le formulaire
+          Navigator.of(context).pop(null);
+
+          getInfos();
+        },
+        onFailure: () {});
   }
 
+/* 
   sendPerm() async {
     print("user changing...");
     showDialog(
@@ -455,11 +540,11 @@ class _AllDepensesState extends State<AllDepenses> {
               matiereController.text = "";
               classeController.text = "";
               periodeController.text = "";
-              if (permissionFilter.length > 0) permissionFilter.clear();
-              permissionFilter.addAll(information);
+              if (infoFilter.length > 0) infoFilter.clear();
+              infoFilter.addAll(information);
               allChk = true;
 
-              permissionFilter.sort((a, b) =>
+              infoFilter.sort((a, b) =>
                   a.datedemandepermission.compareTo(b.datedemandepermission));
             });
             return true;
@@ -479,39 +564,65 @@ class _AllDepensesState extends State<AllDepenses> {
         return false;
       }
     });
-  }
+  } */
 
   void listAll() {
-    filterInfo(null);
-    // setState(() {
-    //   allChk = !allChk;
-    // });
+    filterInfo(true);
   }
 
-  void filterInfo(bool tout, [String centre, String apprenant]) {
+  buildGraph() {
+    // prin
+    var data = [
+      new BudgetEntry("Budget\nPrévisionnel", infoFilter.budgetPrevision,
+          charts.MaterialPalette.yellow.shadeDefault),
+      new BudgetEntry("Total\nEntrées", infoFilter.budgetRecu,
+          charts.MaterialPalette.blue.shadeDefault),
+      new BudgetEntry("Budget\nDépenses", infoFilter.budgetDepense,
+          charts.MaterialPalette.gray.shadeDefault),
+      new BudgetEntry("Plafond", infoFilter.budgetPlafond,
+          charts.MaterialPalette.deepOrange.shadeDefault),
+      new BudgetEntry("Total\nDépenses", infoFilter.totalDepense,
+          charts.MaterialPalette.red.shadeDefault),
+    ];
+
+    var serieList = [
+      new charts.Series<BudgetEntry, String>(
+        id: "Depenses",
+        colorFn: (BudgetEntry budgets, _) => budgets.color,
+        domainFn: (BudgetEntry budgets, _) => budgets.denomination.toString(),
+        measureFn: (BudgetEntry budgets, _) => budgets.montant,
+        data: data,
+        labelAccessorFn: (BudgetEntry budgets, _) => "${budgets.montant} FCFA",
+        overlaySeries: false,
+      )
+    ];
+
+    return SimpleBarChart(
+      serieList,
+      animate: true,
+    );
+  }
+
+  void filterInfo(bool tout,
+      [String centre, String section, String personnel]) {
     setState(() {
       if (!tout) {
-        permissionFilter = information
-            .where(
-              (perm) => ((centre.isEmptyOrNull
-                      ? perm.keypermission.isNotEmpty
-                      : perm.denominationCenter == centre) &&
-                  (apprenant.isEmptyOrNull
-                      ? perm.keypermission.isNotEmpty
-                      : perm.keyapprenant == apprenant)),
-            )
-            .toList();
-        allChk = false;
+        //Pour fair un tri selon la section et le personnel
+        // DenpensePerCentre partial;
+        if (!centre.isEmptyOrNull) {
+          infoFilter = informationPerCentre
+              .firstWhere((depenseCentre) => depenseCentre.keyCenter == centre);
+        }
+        // partial = infoFilter.allChk = false;
       } else {
-        _centreController.text = "";
-        _apprenantController.text = "";
-        if (permissionFilter.length > 0) permissionFilter.clear();
-        // permissionFilter.addAll(mesInformations);
-        permissionFilter.addAll(information);
-
+        centreController.clear();
+        sectionController.clear();
+        personnelController.clear();
+        infoFilter = information;
         allChk = true;
       }
     });
+    separate(infoFilter);
   }
 
   void clearController() {
@@ -525,17 +636,17 @@ class _AllDepensesState extends State<AllDepenses> {
     _datedemandeController.text = "";
   }
 
-  showForm(BuildContext context, PermissionApprenantModel permission) {
-    if (permission != null) {
-      _centreController.text = permission.idCenter.toString();
-      _apprenantController.text = permission.keyapprenant;
-      _motifController.text = permission.motifpermission;
-      _datedebutController.text = permission.datedebutpermission;
-      _datefinController.text = permission.datefinpermission;
-      _heuredebutController.text = permission.heuredebutpermission;
-      _heurefinController.text = permission.heurefinpermission;
-      _datedemandeController.text = permission.datedemandepermission;
-      addPermDto.permissionKey = permission.keypermission;
+  showForm(BuildContext context, PermissionApprenantModel depense) {
+    if (depense != null) {
+      _centreController.text = depense.idCenter.toString();
+      _apprenantController.text = depense.keyapprenant;
+      _motifController.text = depense.motifpermission;
+      _datedebutController.text = depense.datedebutpermission;
+      _datefinController.text = depense.datefinpermission;
+      _heuredebutController.text = depense.heuredebutpermission;
+      _heurefinController.text = depense.heurefinpermission;
+      _datedemandeController.text = depense.datedemandepermission;
+      addPermDto.permissionKey = depense.keypermission;
       addPermDto.operation = "2";
     } else {
       addPermDto.operation = "1";
@@ -573,7 +684,7 @@ class _AllDepensesState extends State<AllDepenses> {
                 addPermDto.heureDebut = _heuredebutController.text ?? "";
                 addPermDto.heureFin = _heurefinController.text ?? "";
               });
-              sendPerm();
+              sendDepense();
             },
           ),
         ],
@@ -582,35 +693,40 @@ class _AllDepensesState extends State<AllDepenses> {
   }
 
   /// Confirmer l'accord ou le refus d'une depense
-  _confirmPermValidation(
-      BuildContext context, dynamic permission, bool accepted) {
+  _confirmValidation(BuildContext context, DepenseModel depense, bool accepted,
+      bool decaisser) {
     showPlatformDialog(
       context: context,
-      builder: (_) => BasicDialogAlert(
+      builder: (context) => BasicDialogAlert(
         title: Text("Confirmer"),
         content: Text(
           "Confirmer " +
-              (accepted ? "l'accord" : "le refus") +
-              " de cette permission",
+              (decaisser
+                  ? "le décaissement"
+                  : (accepted ? "l'accord" : "le refus")) +
+              " de cette dépense",
         ),
         actions: <Widget>[
           TextButton(
             child: Text("Annuler"),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop(null);
             },
           ),
           TextButton(
             child: Text("Valider"),
             onPressed: () {
+              CentreModel center = centres.firstWhere((centre) =>
+                  centre.idCenter == int.tryParse(depense.idcentre));
               setState(() {
                 validateDto.uIdentifiant = widget.me.authKey;
                 validateDto.registrationId = "";
-                validateDto.idCenter = permission.idCenter;
-                validateDto.permissionKey = permission.keypermission;
+                validateDto.cIdentifiant = center.keyCenter;
+                validateDto.dIdentifiant = depense.keydepense;
               });
-              Navigator.pop(context);
-              validate(accepted);
+              Navigator.of(context).pop(null);
+              print("Devrait se fermer");
+              validate(accepted, decaisser);
             },
           ),
         ],
@@ -618,8 +734,7 @@ class _AllDepensesState extends State<AllDepenses> {
     );
   }
 
-  // void _moreAction(context,  permission) {
-  void _moreAction(context, PermissionApprenantModel permission) {
+  void _moreAction(context, DepenseModel depense) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -627,7 +742,7 @@ class _AllDepensesState extends State<AllDepenses> {
         List<Widget> listAction = <Widget>[];
 
         //si la pemission est deja validee on ne peut plus la modifier
-        if (permission.status == "2") {
+        if (depense.status == "2") {
           listAction.add(ListTile(
             leading: Icon(
               Icons.cancel,
@@ -635,32 +750,20 @@ class _AllDepensesState extends State<AllDepenses> {
             ),
             title: Text('Aucune action supplémentaire disponible'),
             /* onTap: () {
-                // showRapportForm(permission);
+                // showRapportForm(depense);
               }, */
           ));
-        } else {
-          /* listAction.add(ListTile(
+        } else if (depense.status == "0") {
+          listAction.add(ListTile(
             leading: Icon(
-              Icons.edit_rounded,
-              color: Colors.blue[300],
+              Icons.check_circle_rounded,
+              color: GreenLight,
             ),
-            title: Text("Modifier"),
-            onTap: () => {
-              showForm(context, permission),
+            title: Text('Accorder'),
+            onTap: () {
+              _confirmValidation(context, depense, true, false);
             },
-          )); */
-          if (permission.status == "0") {
-            listAction.add(ListTile(
-              leading: Icon(
-                Icons.check_circle_rounded,
-                color: GreenLight,
-              ),
-              title: Text('Accorder'),
-              onTap: () {
-                _confirmPermValidation(context, permission, true);
-              },
-            ));
-          }
+          ));
           listAction.add(ListTile(
             leading: Icon(
               Icons.cancel_rounded,
@@ -668,10 +771,33 @@ class _AllDepensesState extends State<AllDepenses> {
             ),
             title: Text('Refuser'),
             onTap: () {
-              _confirmPermValidation(context, permission, false);
+              _confirmValidation(context, depense, false, false);
+            },
+          ));
+        } else if (depense.status == "1" && depense.datedepense.isEmptyOrNull) {
+          listAction.add(ListTile(
+            leading: Icon(
+              Icons.money,
+              color: GreenLight,
+            ),
+            title: Text('Décaisser'),
+            onTap: () {
+              _confirmValidation(context, depense, true, true);
+            },
+          ));
+
+          listAction.add(ListTile(
+            leading: Icon(
+              Icons.cancel_rounded,
+              color: Colors.red[300],
+            ),
+            title: Text('Refuser'),
+            onTap: () {
+              _confirmValidation(context, depense, false, false);
             },
           ));
         }
+
         // } else {
 
         // }

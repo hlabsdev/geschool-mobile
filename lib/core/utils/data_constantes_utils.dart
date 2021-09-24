@@ -25,21 +25,10 @@ class DataConstantesUtils {
   static const String ALL_AFFECTATIONS_SERVER_URL = "/affectations/all";
   static const String ALL_PERMISSIONS_SERVER_URL = "/permissions/all";
   static const String ALL_APPRENANTS_SERVER_URL = "/apprenants/all";
-  static const String ALL_BUDGETS_SERVER_URL = "/budgets/all";
-  /*lists end*/
-
-  /* Auxiliaires deb */
-  static const String CENTRE_SERVER_URL = "/centers/get_info";
   static const String ALL_CLASSES_SERVER_URL = "/absences/add_absence1";
-  static const String NOTES_EVALS_SERVER_URL = "/notes/addnote1";
-  static const String APPRENANT_EVALS_SERVER_URL =
-      "/notes/get_evaluation_eleves";
-  static const String BULLETIN_LINK_SERVER_URL = "/bulletins/print";
-  static const String APPRENANT_CLASSE_SERVER_URL = "/absences/add_absence2";
-  static const String TACHE_USERS_SERVER_URL = "/taches/addtache1";
-  static const String MENU_LIST_SERVER_URL = "/configs/get_info";
-  static const String VALIDATE_AFFECTATIONS_SERVER_URL = "/permissions/treat";
-  /* Auxiliaires end */
+  static const String ALL_BUDGETS_SERVER_URL = "/budgets/all";
+  static const String ALL_DEPENSES_SERVER_URL = "/depenses/all";
+  /*lists end*/
 
   /* Ajout deb */
   static const String NEW_NOTE_SERVER_URL = "/notes/addnote2";
@@ -48,7 +37,21 @@ class DataConstantesUtils {
       "/absences/add_absence3";
   static const String NEW_PERMISSION_URL = "/permissions/add";
   static const String NEW_BUDGET_URL = "/budgets/add";
+  static const String NEW_DEPENSE_URL = "/depenses/add";
   /* Ajout end */
+
+  /* Auxiliaires deb */
+  static const String CENTRE_SERVER_URL = "/centers/get_info";
+  static const String NOTES_EVALS_SERVER_URL = "/notes/addnote1";
+  static const String APPRENANT_EVALS_SERVER_URL =
+      "/notes/get_evaluation_eleves";
+  static const String BULLETIN_LINK_SERVER_URL = "/bulletins/print";
+  static const String APPRENANT_CLASSE_SERVER_URL = "/absences/add_absence2";
+  static const String TACHE_USERS_SERVER_URL = "/taches/addtache1";
+  static const String MENU_LIST_SERVER_URL = "/configs/get_info";
+  static const String VALIDATE_PERMISSION_SERVER_URL = "/permissions/treat";
+  static const String VALIDATE_DEPENSE_SERVER_URL = "/depenses/manage";
+  /* Auxiliaires end */
 
   static const int APP_SERVER_PORT = 0;
 

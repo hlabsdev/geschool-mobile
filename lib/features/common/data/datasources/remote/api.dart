@@ -13,6 +13,7 @@ import 'package:geschool/features/common/data/dto/get_info_dto.dart';
 import 'package:geschool/features/common/data/dto/inscription_dto.dart';
 import 'package:geschool/features/common/data/dto/reset_password_dto.dart';
 import 'package:geschool/features/common/data/dto/tache_dto.dart';
+import 'package:geschool/features/common/data/dto/validate_depense_dto.dart';
 import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/models/basemodels/menu_list_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/absence_apprenant_list_response_model.dart';
@@ -28,6 +29,7 @@ import 'package:geschool/features/common/data/models/respmodels/centre_response_
 import 'package:geschool/features/common/data/models/respmodels/classe_eleve_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/classe_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/conduite_list_reponse_model.dart';
+import 'package:geschool/features/common/data/models/respmodels/depense_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/evaluation_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/mission_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/note_apprenant_list_response_model.dart';
@@ -133,6 +135,14 @@ abstract class Api {
   Future<Either<Failure, BudgetListResponseModel>> validateBudget(
       GetInfoDto infoDto);
 /* Budget end */
+
+/* Depense deb */
+  Future<Either<Failure, DepenseListResponseModel>> getDepenses(
+      GetInfoDto infoDto);
+  Future<Either<Failure, OkResponseModel>> sendDepense(AddBudgetDto infoDto);
+  Future<Either<Failure, OkResponseModel>> validateDepense(
+      ValidateDepenseDto infoDto);
+/* Depense end */
 
 /* End */
 }

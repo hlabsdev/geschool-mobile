@@ -34,9 +34,7 @@ class ElementCard extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style:
-                      // ignore: deprecated_member_use
-                      Theme.of(context).textTheme.title.copyWith(fontSize: 15),
+                  style: TextStyle(fontSize: 15),
                 )
               ],
             ),

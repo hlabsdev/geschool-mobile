@@ -9,7 +9,6 @@ import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/core/utils/connection_status.dart';
 import 'package:geschool/core/utils/preference.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
-import 'package:geschool/features/common/domain/repositories/local_alert_repository.dart';
 import 'package:geschool/features/launch/presentation/pages/absences/apprenant/detail_absence_apprenant.dart';
 import 'package:geschool/features/launch/presentation/pages/absences/apprenant/mes_absences_apprenant.dart';
 import 'package:geschool/features/launch/presentation/pages/absences/apprenant/mes_eleves_absences.dart';
@@ -79,6 +78,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // FirebaseMessaging _fcm = FirebaseMessaging();
+  // ignore: unused_field
   AppSharedPreferences _appSharedPreferences = AppSharedPreferences();
   DateTime currentBackPressTime;
   @override
@@ -97,7 +97,8 @@ class _MyAppState extends State<MyApp> {
         onWillPop: onWillPop,
         child: MaterialApp(
           localizationsDelegates: [GlobalMaterialLocalizations.delegate],
-          supportedLocales: [const Locale('en'), const Locale('fr')],
+          // supportedLocales: [const Locale('fr'),const Locale('en')],
+          supportedLocales: [const Locale('fr')],
           debugShowCheckedModeBanner: false,
           title: 'GeSchool',
           initialRoute: '/',
@@ -209,13 +210,8 @@ class _MyAppState extends State<MyApp> {
               brightness: Brightness.light,
               // primaryColor: FunctionUtils.createMaterialColor(contentPrimaryColor),
               primaryColor: PafpeGreen,
-              // primaryColor: GreenLight,
-              //Changing this will change the color of the TabBar
-              accentColor: Colors.green[700],
               backgroundColor: Colors.grey[200],
               scaffoldBackgroundColor: Colors.grey[200],
-              // primarySwatch: FunctionUtils.createMaterialColor(validBtn),
-              primarySwatch: FunctionUtils.createMaterialColor("137C04"),
               cardColor: Colors.grey[100],
               /* Theme pour les pop up deb */
               dialogTheme: DialogTheme(
@@ -224,14 +220,6 @@ class _MyAppState extends State<MyApp> {
 
               /* Theme pour les pop up end */
 
-              primaryTextTheme: TextTheme(
-                // ignore: deprecated_member_use
-                title: TextStyle(color: Colors.white),
-                // ignore: deprecated_member_use
-                subtitle: TextStyle(color: Colors.white),
-                // ignore: deprecated_member_use
-                subhead: TextStyle(color: Colors.white),
-              ),
               appBarTheme: AppBarTheme(
                 //color: Colors.white,
                 elevation: 0,
@@ -250,7 +238,11 @@ class _MyAppState extends State<MyApp> {
                     fontSizeFactor: 0.9,
                     fontSizeDelta: 2.0,
                     //displayColor: primaryColor
-                  )),
+                  ),
+              colorScheme: ColorScheme.fromSwatch(
+                      primarySwatch:
+                          FunctionUtils.createMaterialColor("137C04"))
+                  .copyWith(secondary: Colors.green[700])),
         ));
   }
 
@@ -276,7 +268,7 @@ class _MyAppState extends State<MyApp> {
   registerInfo(Map<String, dynamic> notifInfo) async {
     print(notifInfo);
 
-    _appSharedPreferences.getUserKey().then((_memberKey) {
+    /* _appSharedPreferences.getUserKey().then((_memberKey) {
       String status = notifInfo['data']['status'];
       String keyAlert = notifInfo['data']['key_alert'];
       if (status != null && status.compareTo("000") == 0) {
@@ -288,7 +280,7 @@ class _MyAppState extends State<MyApp> {
           }
         });
       }
-    });
+    }); */
   }
 
 /*

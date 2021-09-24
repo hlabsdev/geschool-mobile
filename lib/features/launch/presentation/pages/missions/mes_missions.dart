@@ -232,29 +232,29 @@ class _MyMissionsState extends State<MyMissions> {
               information = a.information;
               mesInformations =
                   a.information.where((element) => element.isMe == 1).toList();
-            });
-            passee.clear();
-            avenir.clear();
-            encour.clear();
-            passee = a.information
-                .where((element) =>
-                    FunctionUtils.getDateEtat(
-                        element.datedepart, element.dateretourprob) ==
-                    1)
-                .toList();
-            avenir = a.information
-                .where((element) =>
-                    FunctionUtils.getDateEtat(
-                        element.datedepart, element.dateretourprob) ==
-                    2)
-                .toList();
-            encour = a.information
-                .where((element) =>
-                    FunctionUtils.getDateEtat(
-                        element.datedepart, element.dateretourprob) ==
-                    3)
-                .toList();
 
+              passee.clear();
+              avenir.clear();
+              encour.clear();
+              passee = mesInformations
+                  .where((element) =>
+                      FunctionUtils.getDateEtat(
+                          element.datedepart, element.dateretourprob) ==
+                      1)
+                  .toList();
+              avenir = mesInformations
+                  .where((element) =>
+                      FunctionUtils.getDateEtat(
+                          element.datedepart, element.dateretourprob) ==
+                      2)
+                  .toList();
+              encour = mesInformations
+                  .where((element) =>
+                      FunctionUtils.getDateEtat(
+                          element.datedepart, element.dateretourprob) ==
+                      3)
+                  .toList();
+            });
             loading(false);
             checkAdmin(a.isAdmin);
             return true;

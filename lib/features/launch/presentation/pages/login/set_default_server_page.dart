@@ -123,7 +123,7 @@ class _SetServerPageState extends State<SetServerPage> {
                           margin: EdgeInsets.all(10.0),
                           child: Column(
                             children: [
-                              Container(
+                              /* Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8)),
                                 // ignore: deprecated_member_use
@@ -145,7 +145,7 @@ class _SetServerPageState extends State<SetServerPage> {
                                     visualDensity: VisualDensity.compact,
                                   ),
                                 ).p16(),
-                              ),
+                              ), */
                               Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8)),

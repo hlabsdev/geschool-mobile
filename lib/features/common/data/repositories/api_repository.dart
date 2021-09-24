@@ -23,6 +23,7 @@ import 'package:geschool/features/common/data/dto/get_info_dto.dart';
 import 'package:geschool/features/common/data/dto/inscription_dto.dart';
 import 'package:geschool/features/common/data/dto/reset_password_dto.dart';
 import 'package:geschool/features/common/data/dto/tache_dto.dart';
+import 'package:geschool/features/common/data/dto/validate_depense_dto.dart';
 import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/models/basemodels/menu_list_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/absence_apprenant_list_response_model.dart';
@@ -38,6 +39,7 @@ import 'package:geschool/features/common/data/models/respmodels/centre_response_
 import 'package:geschool/features/common/data/models/respmodels/classe_eleve_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/classe_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/conduite_list_reponse_model.dart';
+import 'package:geschool/features/common/data/models/respmodels/depense_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/evaluation_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/mission_list_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/note_apprenant_list_response_model.dart';
@@ -1124,7 +1126,7 @@ class ApiRepository implements Api {
     if (await networkInfo.isConnected) {
       try {
         var finalUrl = (defaultServer.toString() +
-                DataConstantesUtils.VALIDATE_AFFECTATIONS_SERVER_URL.toString())
+                DataConstantesUtils.VALIDATE_PERMISSION_SERVER_URL.toString())
             .toString();
         var accesToken = DataConstantesUtils.SERVER_TOKEN;
         infoDto.accessToken = accesToken;
@@ -1234,6 +1236,105 @@ class ApiRepository implements Api {
       try {
         var finalUrl = (defaultServer.toString() +
                 DataConstantesUtils.NEW_BUDGET_URL.toString())
+            .toString();
+        var accesToken = DataConstantesUtils.SERVER_TOKEN;
+        infoDto.accessToken = accesToken;
+        FormData formData = new FormData.fromMap(infoDto.toJson());
+        var response = await dio.post(finalUrl, data: formData);
+        var data = response.data;
+        Map<String, dynamic> responseMap = jsonDecode(data);
+
+        return Right((OkResponseModel.fromJson(responseMap)));
+      } on DioError catch (ex) {
+        if (ex.type == DioErrorType.CONNECT_TIMEOUT) {
+          throw Exception(allTranslations.text('connection_timeout'));
+        } else if (ex.type == DioErrorType.RECEIVE_TIMEOUT) {
+          throw Exception(allTranslations.text('receive_timeout'));
+        } else if (ex.type == DioErrorType.RESPONSE) {
+          throw Exception(allTranslations.text('server_incorrect'));
+        }
+        throw Exception(ex.message);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(CacheFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, DepenseListResponseModel>> getDepenses(
+      GetInfoDto infoDto) async {
+    if (await networkInfo.isConnected) {
+      try {
+        var finalUrl = (defaultServer.toString() +
+                DataConstantesUtils.ALL_DEPENSES_SERVER_URL.toString())
+            .toString();
+        var accesToken = DataConstantesUtils.SERVER_TOKEN;
+        infoDto.accessToken = accesToken;
+        FormData formData = new FormData.fromMap(infoDto.toJson());
+        var response = await dio.post(finalUrl, data: formData);
+        var data = response.data;
+        Map<String, dynamic> responseMap = jsonDecode(data);
+
+        return Right((DepenseListResponseModel.fromJson(responseMap)));
+      } on DioError catch (ex) {
+        if (ex.type == DioErrorType.CONNECT_TIMEOUT) {
+          throw Exception(allTranslations.text('connection_timeout'));
+        } else if (ex.type == DioErrorType.RECEIVE_TIMEOUT) {
+          throw Exception(allTranslations.text('receive_timeout'));
+        } else if (ex.type == DioErrorType.RESPONSE) {
+          throw Exception(allTranslations.text('server_incorrect'));
+        }
+        throw Exception(ex.message);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(CacheFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, OkResponseModel>> sendDepense(
+      AddBudgetDto infoDto) async {
+    if (await networkInfo.isConnected) {
+      try {
+        var finalUrl = (defaultServer.toString() +
+                DataConstantesUtils.NEW_DEPENSE_URL.toString())
+            .toString();
+        var accesToken = DataConstantesUtils.SERVER_TOKEN;
+        infoDto.accessToken = accesToken;
+        FormData formData = new FormData.fromMap(infoDto.toJson());
+        var response = await dio.post(finalUrl, data: formData);
+        var data = response.data;
+        Map<String, dynamic> responseMap = jsonDecode(data);
+
+        return Right((OkResponseModel.fromJson(responseMap)));
+      } on DioError catch (ex) {
+        if (ex.type == DioErrorType.CONNECT_TIMEOUT) {
+          throw Exception(allTranslations.text('connection_timeout'));
+        } else if (ex.type == DioErrorType.RECEIVE_TIMEOUT) {
+          throw Exception(allTranslations.text('receive_timeout'));
+        } else if (ex.type == DioErrorType.RESPONSE) {
+          throw Exception(allTranslations.text('server_incorrect'));
+        }
+        throw Exception(ex.message);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(CacheFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, OkResponseModel>> validateDepense(
+      ValidateDepenseDto infoDto) async {
+    if (await networkInfo.isConnected) {
+      try {
+        var finalUrl = (defaultServer.toString() +
+                DataConstantesUtils.VALIDATE_DEPENSE_SERVER_URL.toString())
             .toString();
         var accesToken = DataConstantesUtils.SERVER_TOKEN;
         infoDto.accessToken = accesToken;

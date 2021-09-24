@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-import 'package:geschool/features/common/data/datasources/remote/api.dart';
-
-import 'package:geschool/features/common/data/repositories/api_repository.dart';
 
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -705,6 +702,30 @@ class FunctionUtils {
     return key;
   }
 
+  static getPersonnelName(String key, List<dynamic> allList) {
+    String name;
+    var perso;
+    perso = allList.firstWhere((element) => element.keypersonnel == key,
+        orElse: () => null);
+    name = "${perso.nom} ${perso.prenoms}";
+    return name;
+  }
+
+  static String getPersonnelKey(String name, List<dynamic> allList) {
+    String key;
+    var perso;
+    if (!name.isEmptyOrNull) {
+      perso = allList.firstWhere(
+        (element) =>
+            (element.nom + " " + element.prenoms).toLowerCase() ==
+            name.toLowerCase(),
+        orElse: () => null,
+      );
+      key = perso.keypersonnel;
+    }
+    return key;
+  }
+
   static renderTacheColor(TacheModel tache) {
     Color result = tache.rapportTache.isEmptyOrNotNull
         ? Colors.grey[100]
@@ -784,16 +805,12 @@ class FunctionUtils {
             ),
           );
         });
-    Api api = ApiRepository();
     repositoryFunction(dto).then((value) {
       if (value.isRight()) {
         value.all((a) {
           if (a != null && a.status.compareTo("000") == 0) {
             /* ===== quand l'api retourne un code "000" ===== */
             ///On ferme l'animation du loading
-            Navigator.of(context).pop(null);
-
-            ///On ferme le formulaire
             Navigator.of(context).pop(null);
 
             ///On netoie les champs du formulaire
@@ -850,7 +867,7 @@ class FunctionUtils {
     Function repositoryFunction,
 
     /// Fonction a executer quand la reception de donnee s'est bien passee
-    Function(dynamic) onSuccess,
+    Function onSuccess,
 
     /// Fonction a executer en cas d'erreur lors de la reception de donnees
     Function onEmpty,

@@ -101,7 +101,7 @@
   "pls_setold_password": "Veuillez saisir le mot de passe actuel",
   "pls_confirm_new_passxord": "Veuillez confirmer le nouveau mot de passe",
   "pls_set_denomination": "Veuillez saisir la dénomination",
-  "pls_set_date": "Veuillez renseigner la date",
+  "pls_set_date_operation": "Veuillez renseigner la date de l'opération",
   "pls_set_datetache": "Veuillez renseigner la date de la tache",
   "pls_set_daterappel": "Veuillez renseigner la date de rappel",
   "pls_set_site_web": "Veuillez saisir l'adresse du site web",

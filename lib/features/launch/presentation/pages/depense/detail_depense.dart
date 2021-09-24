@@ -3,23 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:geschool/allTranslations.dart';
 import 'package:geschool/core/utils/colors.dart';
-import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
-import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
+import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
-import 'package:geschool/features/common/data/repositories/api_repository.dart';
+import 'package:geschool/features/common/data/models/respmodels/depense_list_response_model.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_fab.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_text.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 // ignore: must_be_immutable
 class DetailDepense extends StatefulWidget {
-  PermissionApprenantModel depense;
+  DepenseModel depense;
   UserModel me;
+  Sections section;
   List<ApprenantModel> apprenants;
   List<CentreModel> centres;
 
@@ -27,6 +27,7 @@ class DetailDepense extends StatefulWidget {
     Key key,
     this.depense,
     this.me,
+    this.section,
     this.apprenants,
     this.centres,
   }) : super(key: key);
@@ -53,9 +54,9 @@ class _DetailDepenseState extends State<DetailDepense> {
 
   @override
   void initState() {
-    validateDto.idCenter = widget.depense.idCenter;
+    validateDto.idCenter = widget.depense.idcentre;
     validateDto.uIdentifiant = widget.me.authKey;
-    validateDto.permissionKey = widget.depense.keypermission;
+    validateDto.permissionKey = widget.depense.keydepense;
     validateDto.registrationId = "";
     // Perm
     addPermDto.uIdentifiant = widget.me.authKey;
@@ -111,7 +112,73 @@ class _DetailDepenseState extends State<DetailDepense> {
       body: ListView(
         children: [
           SizedBox(height: 20),
+          /* Tableau deb */
+          Card(
+            margin: EdgeInsets.all(10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: DataTable(
+              horizontalMargin: 5,
+              sortAscending: true,
+              sortColumnIndex: 1,
+              columns: [
+                DataColumn(
+                    label: Text("Date de\nDécaissement",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text("état".toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text("Montant",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold))),
+              ],
+              rows: [
+                DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
+                        FunctionUtils.convertFormatDate(
+                            widget.depense.datedepense),
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      renderEtatDepense(int.parse(widget.depense.status), 12),
+                      // Text(
 
+                      //   textAlign: TextAlign.center,
+                      //   style: TextStyle(
+                      //     fontSize: 12,
+                      //   ),
+                      // ),
+                    ),
+                    DataCell(
+                      Text(
+                        widget.depense.montantdepense,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              // rows: generateRow(widget.noms[i]),
+            ),
+          ),
+          /* Tableau end */
+          /* =============================================================== */
           /* Details deb */
           Card(
             margin: EdgeInsets.all(10),
@@ -119,12 +186,14 @@ class _DetailDepenseState extends State<DetailDepense> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 8),
                 //Etat
                 Center(
                   child: renderEtatDepense(int.parse(widget.depense.status)),
                 ),
+                // Section concernee
                 ListTile(
                   leading: Icon(
                     Icons.local_convenience_store_rounded,
@@ -145,7 +214,7 @@ class _DetailDepenseState extends State<DetailDepense> {
                   subtitle: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Text(
-                      (widget.depense.denominationCenter) ??
+                      (widget.section.designation) ??
                           allTranslations.text('not_defined'),
                       style: TextStyle(
                         fontSize: 14,
@@ -154,6 +223,7 @@ class _DetailDepenseState extends State<DetailDepense> {
                     ),
                   ),
                 ),
+                // Nom du personnel qui q fqit lq demande
                 ListTile(
                   leading: Icon(
                     Icons.person,
@@ -183,6 +253,34 @@ class _DetailDepenseState extends State<DetailDepense> {
                     ),
                   ),
                 ),
+                // Date de demande
+                ListTile(
+                  leading: Icon(
+                    Icons.date_range,
+                    size: 30,
+                  ),
+                  contentPadding: EdgeInsets.only(right: 10, left: 5),
+                  title: Text(
+                    "Date de demande",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: PafpeGreen,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    FunctionUtils.convertFormatDate(widget.depense.datedemande),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blueGrey[800],
+                    ),
+                  ),
+                  isThreeLine: true,
+                ),
+
+                // Description
                 ListTile(
                   leading: Icon(
                     Icons.format_align_justify,
@@ -201,80 +299,94 @@ class _DetailDepenseState extends State<DetailDepense> {
                     // textAlign: TextAlign.justify,
                   ),
                   subtitle: ExpandableText(
-                      widget.depense.motifpermission ??
+                      widget.depense.description ??
                           allTranslations.text('not_defined'),
                       "Description"),
                   isThreeLine: true,
                 ),
+                // Motif
+                ListTile(
+                  leading: Icon(
+                    Icons.format_align_justify,
+                    size: 30,
+                  ),
+                  contentPadding: EdgeInsets.only(right: 10, left: 5),
+                  title: Text(
+                    "Motif",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: PafpeGreen,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    // textAlign: TextAlign.justify,
+                  ),
+                  subtitle: ExpandableText(
+                      widget.depense.motifdemande ??
+                          allTranslations.text('not_defined'),
+                      "Motif"),
+                  isThreeLine: true,
+                ),
+                // Date de traitement
+                widget.depense.datetraitement.isEmptyOrNull
+                    ? SizedBox(height: 0, width: 0)
+                    : ListTile(
+                        leading: Icon(
+                          Icons.date_range,
+                          size: 30,
+                        ),
+                        contentPadding: EdgeInsets.only(right: 10, left: 5),
+                        title: Text(
+                          "Date de demande",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: PafpeGreen,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          FunctionUtils.convertFormatDate(
+                              widget.depense.datedemande),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blueGrey[800],
+                          ),
+                        ),
+                        isThreeLine: true,
+                      ),
+                // Motif rejet
+                widget.depense.motifsuppression.isEmptyOrNull
+                    ? SizedBox(height: 0, width: 0)
+                    : ListTile(
+                        leading: Icon(
+                          Icons.format_align_justify,
+                          size: 30,
+                        ),
+                        contentPadding: EdgeInsets.only(right: 10, left: 5),
+                        title: Text(
+                          "Motif de rejet",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: PafpeGreen,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          // textAlign: TextAlign.justify,
+                        ),
+                        subtitle: ExpandableText(
+                            widget.depense.motifsuppression ??
+                                allTranslations.text('not_defined'),
+                            "Motif de rejet"),
+                        isThreeLine: true,
+                      ),
               ],
             ),
           ),
           /* Details end */
-
-          /* Tableau deb */
-          Card(
-            margin: EdgeInsets.all(10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: DataTable(
-              // horizontalMargin: 5,
-              sortAscending: true,
-              sortColumnIndex: 1,
-              columns: [
-                DataColumn(
-                    label: Text("Date demande",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold))),
-                DataColumn(
-                    label: Text("état".toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold))),
-                DataColumn(
-                    label: Text("Montant",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold))),
-              ],
-              rows: [
-                DataRow(
-                  cells: [
-                    DataCell(
-                      Text(
-                        FunctionUtils.convertFormatDate(
-                            widget.depense.datedemandepermission),
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      renderEtatDepense(int.parse(widget.depense.status), 12),
-                      // Text(
-
-                      //   textAlign: TextAlign.center,
-                      //   style: TextStyle(
-                      //     fontSize: 12,
-                      //   ),
-                      // ),
-                    ),
-                    DataCell(
-                      Text(
-                        widget.depense.datedebutpermission,
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              // rows: generateRow(widget.noms[i]),
-            ),
-          ),
-          /* Tableau end */
           SizedBox(height: 20),
         ],
       ),
@@ -283,120 +395,120 @@ class _DetailDepenseState extends State<DetailDepense> {
   }
 
   /// Envoyer la depense
-  sendPerm() async {
-    print("user changing...");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(allTranslations.text('processing')),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator(
-                    // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
-                    )
-              ],
-            ),
-          );
-        });
-    Api api = ApiRepository();
-    api.sendPerm(addPermDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de l'utilisateur dans la session
-            Navigator.of(context).pop(null);
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 1);
-            clearController();
-            setState(() {
-              widget.depense = a.information.firstWhere((element) =>
-                  element.keypermission == widget.depense.keypermission);
-            });
-            return true;
-          } else {
-            //l'api a retourne une Erreur
-            Navigator.of(context).pop(null);
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 0);
-            return false;
-          }
-        });
-      } else {
-        Navigator.of(context).pop(null);
-        Navigator.of(context).pop(null);
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    });
-  }
+  // sendPerm() async {
+  //   print("user changing...");
+  //   showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           backgroundColor: Colors.white,
+  //           contentPadding: EdgeInsets.all(12),
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: <Widget>[
+  //               Text(allTranslations.text('processing')),
+  //               SizedBox(
+  //                 height: 20,
+  //               ),
+  //               CircularProgressIndicator(
+  //                   // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
+  //                   )
+  //             ],
+  //           ),
+  //         );
+  //       });
+  //   Api api = ApiRepository();
+  //   api.sendPerm(addPermDto).then((value) {
+  //     if (value.isRight()) {
+  //       value.all((a) {
+  //         if (a != null && a.status.compareTo("000") == 0) {
+  //           //enregistrement des informations de l'utilisateur dans la session
+  //           Navigator.of(context).pop(null);
+  //           Navigator.of(context).pop(null);
+  //           FunctionUtils.displaySnackBar(context, a.message, type: 1);
+  //           clearController();
+  //           setState(() {
+  //             widget.depense = a.information.firstWhere((element) =>
+  //                 element.keypermission == widget.depense.keypermission);
+  //           });
+  //           return true;
+  //         } else {
+  //           //l'api a retourne une Erreur
+  //           Navigator.of(context).pop(null);
+  //           Navigator.of(context).pop(null);
+  //           FunctionUtils.displaySnackBar(context, a.message, type: 0);
+  //           return false;
+  //         }
+  //       });
+  //     } else {
+  //       Navigator.of(context).pop(null);
+  //       Navigator.of(context).pop(null);
+  //       FunctionUtils.displaySnackBar(
+  //           context, allTranslations.text('error_process'));
+  //       return false;
+  //     }
+  //   });
+  // }
 
   /// envoie des donnees au serveur {
-  validate(bool accorded) async {
-    setState(() {
-      validateDto.operation = accorded ? "1" : "2";
-    });
-    print("user changing...");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(allTranslations.text('processing')),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator(
-                    // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
-                    )
-              ],
-            ),
-          );
-        });
+  // validate(bool accorded) async {
+  //   setState(() {
+  //     validateDto.operation = accorded ? "1" : "2";
+  //   });
+  //   print("user changing...");
+  //   showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           backgroundColor: Colors.white,
+  //           contentPadding: EdgeInsets.all(12),
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: <Widget>[
+  //               Text(allTranslations.text('processing')),
+  //               SizedBox(
+  //                 height: 20,
+  //               ),
+  //               CircularProgressIndicator(
+  //                   // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
+  //                   )
+  //             ],
+  //           ),
+  //         );
+  //       });
 
-    Api api = ApiRepository();
-    api.validatePerm(validateDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de l'utilisateur dans la session
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 1);
-            return true;
-          } else {
-            //l'api a retourne une Erreur
-            Navigator.of(context).pop(null);
+  //   Api api = ApiRepository();
+  //   api.validatePerm(validateDto).then((value) {
+  //     if (value.isRight()) {
+  //       value.all((a) {
+  //         if (a != null && a.status.compareTo("000") == 0) {
+  //           //enregistrement des informations de l'utilisateur dans la session
+  //           Navigator.of(context).pop(null);
+  //           FunctionUtils.displaySnackBar(context, a.message, type: 1);
+  //           return true;
+  //         } else {
+  //           //l'api a retourne une Erreur
+  //           Navigator.of(context).pop(null);
 
-            FunctionUtils.displaySnackBar(context, a.message, type: 0);
-            return false;
-          }
-        });
-      } else {
-        Navigator.of(context).pop(null);
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    });
-  }
+  //           FunctionUtils.displaySnackBar(context, a.message, type: 0);
+  //           return false;
+  //         }
+  //       });
+  //     } else {
+  //       Navigator.of(context).pop(null);
+  //       FunctionUtils.displaySnackBar(
+  //           context, allTranslations.text('error_process'));
+  //       return false;
+  //     }
+  //   });
+  // }
 
   _confirmPermValidation(BuildContext context, bool accepted) {
     showPlatformDialog(
       context: context,
-      builder: (_) => BasicDialogAlert(
+      builder: (context) => BasicDialogAlert(
         title: Text("Confirmer"),
         content: Text(
           "Confirmer " +
@@ -415,7 +527,7 @@ class _DetailDepenseState extends State<DetailDepense> {
             onPressed: () {
               Navigator.pop(context);
               setState(() {
-                validate(accepted);
+                // validate(accepted);
               });
             },
           ),
@@ -427,15 +539,15 @@ class _DetailDepenseState extends State<DetailDepense> {
 /* Forms */
 
   void showAddForm() {
-    _centreController.text = widget.depense.idCenter.toString();
-    _apprenantController.text = widget.depense.keyapprenant;
-    _motifController.text = widget.depense.motifpermission;
-    _datedebutController.text = widget.depense.datedebutpermission;
-    _datefinController.text = widget.depense.datefinpermission;
-    _heuredebutController.text = widget.depense.heuredebutpermission;
-    _heurefinController.text = widget.depense.heurefinpermission;
-    _datedemandeController.text = widget.depense.datedemandepermission;
-    addPermDto.permissionKey = widget.depense.keypermission;
+    // _centreController.text = widget.depense.idCenter.toString();
+    // _apprenantController.text = widget.depense.keyapprenant;
+    // _motifController.text = widget.depense.motifpermission;
+    // _datedebutController.text = widget.depense.datedebutpermission;
+    // _datefinController.text = widget.depense.datefinpermission;
+    // _heuredebutController.text = widget.depense.heuredebutpermission;
+    // _heurefinController.text = widget.depense.heurefinpermission;
+    // _datedemandeController.text = widget.depense.datedemandepermission;
+    // addPermDto.permissionKey = widget.depense.keypermission;
     addPermDto.operation = "2";
     showDialog(
         context: context,
@@ -473,7 +585,7 @@ class _DetailDepenseState extends State<DetailDepense> {
                               _heuredebutController.text ?? "";
                           addPermDto.heureFin = _heurefinController.text ?? "";
                         });
-                        sendPerm();
+                        // sendPerm();
                       }
                     },
                     child: Text(allTranslations.text('submit')),
@@ -487,15 +599,15 @@ class _DetailDepenseState extends State<DetailDepense> {
   }
 
   showForm() {
-    _centreController.text = widget.depense.idCenter.toString();
-    _apprenantController.text = widget.depense.keyapprenant;
-    _motifController.text = widget.depense.motifpermission;
-    _datedebutController.text = widget.depense.datedebutpermission;
-    _datefinController.text = widget.depense.datefinpermission;
-    _heuredebutController.text = widget.depense.heuredebutpermission;
-    _heurefinController.text = widget.depense.heurefinpermission;
-    _datedemandeController.text = widget.depense.datedemandepermission;
-    addPermDto.permissionKey = widget.depense.keypermission;
+    // _centreController.text = widget.depense.idCenter.toString();
+    // _apprenantController.text = widget.depense.keyapprenant;
+    // _motifController.text = widget.depense.motifpermission;
+    // _datedebutController.text = widget.depense.datedebutpermission;
+    // _datefinController.text = widget.depense.datefinpermission;
+    // _heuredebutController.text = widget.depense.heuredebutpermission;
+    // _heurefinController.text = widget.depense.heurefinpermission;
+    // _datedemandeController.text = widget.depense.datedemandepermission;
+    // addPermDto.permissionKey = widget.depense.keypermission;
     addPermDto.operation = "2";
 
     showPlatformDialog(
@@ -524,7 +636,7 @@ class _DetailDepenseState extends State<DetailDepense> {
                 addPermDto.heureDebut = _heuredebutController.text ?? "";
                 addPermDto.heureFin = _heurefinController.text ?? "";
               });
-              sendPerm();
+              // sendPerm();
             },
           ),
         ],

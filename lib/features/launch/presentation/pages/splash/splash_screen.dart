@@ -68,6 +68,7 @@ class _SplashPageState extends State<SplashPage> {
     if (startupNumber < 1 || startupNumber == 0) {
       UserPreferences().localServer =
           json.encode("http://192.168.20.11/geschool/api/web/mobile_v1");
+      // UserPreferences().onlineServer = json.encode("https://geschool.datawise.site/api/web/mobile_v1");
       UserPreferences().onlineServer =
           json.encode("https://testgeschool.datawise.site/api/web/mobile_v1");
       UserPreferences().defaultServer = allTranslations.text('online');

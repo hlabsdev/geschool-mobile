@@ -1,20 +1,20 @@
+// ignore_for_file: non_constant_identifier_names, unused_field
+
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geschool/allTranslations.dart';
 import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/add_budget_dto.dart';
-import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/get_info_dto.dart';
 import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/detail_budget_model.dart';
-import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/budget_list_response_model.dart';
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
-import 'package:geschool/features/launch/presentation/widgets/budget_chart.dart';
+import 'package:geschool/features/launch/presentation/widgets/data_chart.dart';
 import 'package:geschool/features/launch/presentation/widgets/cards/budget_card_widget.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/refreshable_widget.dart';
 import 'package:geschool/features/launch/presentation/widgets/filter_pane_widget.dart';
@@ -326,6 +326,9 @@ class _AllBudgetsState extends State<AllBudgets> {
         repositoryFunction: api.sendBudget,
         clearController: clearController,
         onSuccess: (a) {
+          ///On ferme le formulaire
+          Navigator.of(context).pop(null);
+
           getInfos();
           /* setState(() {
             information.clear();

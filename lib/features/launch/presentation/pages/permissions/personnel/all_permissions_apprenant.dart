@@ -712,15 +712,19 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
         repositoryFunction: api.sendPerm,
         clearController: clearController,
         onSuccess: (a) {
-          setState(() {
-            information = a.information;
-            if (permissionFilter.length > 0) permissionFilter.clear();
-            permissionFilter.addAll(information);
-            allChk = true;
-            permissionFilter.sort((a, b) =>
-                DateTime.tryParse(b.datedemandepermission)
-                    .compareTo(DateTime.tryParse(a.datedemandepermission)));
-          });
+          ///On ferme le formulaire
+          Navigator.of(context).pop(null);
+
+          getInfos();
+          // setState(() {
+          //   information = a.information;
+          //   if (permissionFilter.length > 0) permissionFilter.clear();
+          //   permissionFilter.addAll(information);
+          //   allChk = true;
+          //   permissionFilter.sort((a, b) =>
+          //       DateTime.tryParse(b.datedemandepermission)
+          //           .compareTo(DateTime.tryParse(a.datedemandepermission)));
+          // });
         },
         onFailure: () {});
   }
@@ -865,6 +869,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
 
     centres.length == 1
         ? _centreController.text = centres.first.idCenter.toString()
+        // ignore: unnecessary_statements
         : null;
 
     showDialog(
@@ -1119,9 +1124,9 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
 
   _confirmPermValidation(
       BuildContext context, dynamic permission, bool accepted) {
-    showPlatformDialog(
+    showDialog(
       context: context,
-      builder: (_) => BasicDialogAlert(
+      builder: (context) => AlertDialog(
         title: Text("Confirmer"),
         content: Text(
           "Confirmer " +
@@ -1132,7 +1137,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
           TextButton(
             child: Text("Annuler"),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop();
             },
           ),
           TextButton(
@@ -1144,7 +1149,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                 validateDto.idCenter = permission.idCenter;
                 validateDto.permissionKey = permission.keypermission;
               });
-              Navigator.pop(context);
+              Navigator.of(context).pop();
               validate(accepted);
             },
           ),

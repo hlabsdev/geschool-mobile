@@ -65,7 +65,7 @@ class _SingleFilterPaneWidgetState extends State<SingleFilterPaneWidget> {
                       widget.onChanged(value);
                     },
                   )
-                : DropdownButton(
+                : DropdownButtonFormField(
                     isExpanded: true,
                     items: widget.items,
                     icon: widget.icon,
@@ -158,13 +158,7 @@ class DoubleFilterPaneWidget extends StatefulWidget {
 }
 
 class _DoubleFilterPaneWidgetState extends State<DoubleFilterPaneWidget> {
-  bool _allChk = false;
-
-  bool get allChk => _allChk;
-
-  set allChk(bool allChk) {
-    _allChk = allChk;
-  }
+  bool allChk = false;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +185,7 @@ class _DoubleFilterPaneWidgetState extends State<DoubleFilterPaneWidget> {
                           widget.onChanged1(value);
                         },
                       )
-                    : DropdownButton(
+                    : DropdownButtonFormField(
                         isExpanded: true,
                         items: widget.items1,
                         icon: widget.icon1,
@@ -216,7 +210,7 @@ class _DoubleFilterPaneWidgetState extends State<DoubleFilterPaneWidget> {
                           widget.onChanged2(value);
                         },
                       )
-                    : DropdownButton(
+                    : DropdownButtonFormField(
                         isExpanded: true,
                         items: widget.items2,
                         icon: widget.icon2,
@@ -279,30 +273,48 @@ class TripleFilterPaneWidget extends StatefulWidget {
   /// ```
   List<DropdownMenuItem<dynamic>> items2;
 
+  /// Exemple :
+  /// ```dart
+  /// thirdList.map((item) =>
+  /// DropdownMenuItem(
+  ///   child: Text(item.label),
+  ///   value: item.value,
+  /// ))
+  /// .toList()
+  /// ```
+  List<DropdownMenuItem<dynamic>> items3;
+
   Icon icon1;
   Icon icon2;
+  Icon icon3;
   dynamic hint1;
   dynamic hint2;
+  dynamic hint3;
 
-  /// if true [hint1] and [hint2] must not be null
+  /// if true [hint1], [hint2] and [hint3] must not be null
   bool isSearchable;
   Function onChanged1;
   Function onChanged2;
+  Function onChanged3;
   Function onChecked;
   Function listAll;
 
   TripleFilterPaneWidget({
     Key key,
-    this.items1,
-    this.items2,
+    @required this.items1,
+    @required this.items2,
+    this.items3,
     this.hint1,
     this.hint2,
-    this.onChanged1,
-    this.onChanged2,
+    this.hint3,
+    @required this.onChanged1,
+    @required this.onChanged2,
+    @required this.onChanged3,
     this.onChecked,
-    this.listAll,
+    @required this.listAll,
     this.icon1,
     this.icon2,
+    this.icon3,
     this.isSearchable = false,
   }) : super(key: key);
 
@@ -324,7 +336,8 @@ class _TripleFilterPaneWidgetState extends State<TripleFilterPaneWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: (MediaQuery.of(context).size.width / 2.3),
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width / 3.3),
                 child: widget.isSearchable
                     ? SearchableDropdown(
                         closeButton: "Fermer",
@@ -337,7 +350,7 @@ class _TripleFilterPaneWidgetState extends State<TripleFilterPaneWidget> {
                           widget.onChanged1(value);
                         },
                       )
-                    : DropdownButton(
+                    : DropdownButtonFormField(
                         isExpanded: true,
                         items: widget.items1,
                         icon: widget.icon1,
@@ -348,7 +361,8 @@ class _TripleFilterPaneWidgetState extends State<TripleFilterPaneWidget> {
                       ),
               ),
               Container(
-                width: (MediaQuery.of(context).size.width / 2.3),
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width / 3.3),
                 child: widget.isSearchable
                     ? SearchableDropdown(
                         closeButton: "Fermer",
@@ -361,13 +375,38 @@ class _TripleFilterPaneWidgetState extends State<TripleFilterPaneWidget> {
                           widget.onChanged2(value);
                         },
                       )
-                    : DropdownButton(
+                    : DropdownButtonFormField(
                         isExpanded: true,
+                        icon: widget.icon2,
+                        hint: widget.hint2,
+                        items: widget.items2,
+                        onChanged: (value) {
+                          widget.onChanged2(value);
+                        },
+                      ),
+              ),
+              Container(
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width / 3.3),
+                child: widget.isSearchable
+                    ? SearchableDropdown(
+                        closeButton: "Fermer",
+                        isExpanded: true,
+                        dialogBox: true,
                         items: widget.items2,
                         icon: widget.icon2,
                         hint: widget.hint2,
                         onChanged: (value) {
                           widget.onChanged2(value);
+                        },
+                      )
+                    : DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        icon: widget.icon3,
+                        hint: widget.hint3,
+                        items: widget.items3,
+                        onChanged: (value) {
+                          widget.onChanged3(value);
                         },
                       ),
               ),

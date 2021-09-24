@@ -167,10 +167,10 @@ class ActionButton extends StatelessWidget {
     final theme = Theme.of(context);
     return Material(
       shape: const CircleBorder(),
-      color: color ?? theme.accentColor,
+      color: color ?? theme.colorScheme.secondary,
       elevation: 4.0,
       child: IconTheme.merge(
-        data: theme.accentIconTheme,
+        data: theme.iconTheme,
         child: IconButton(
           onPressed: onPressed,
           icon: icon,

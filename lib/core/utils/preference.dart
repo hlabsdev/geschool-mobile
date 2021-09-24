@@ -1,8 +1,6 @@
 import 'package:geschool/allTranslations.dart';
 import 'package:geschool/core/utils/connection_status.dart';
 import 'package:geschool/core/utils/core_constantes.dart';
-import 'package:geschool/features/common/data/models/basemodels/absence_model.dart';
-import 'package:geschool/features/common/data/models/basemodels/user_filter_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSharedPreferences {
@@ -59,14 +57,6 @@ class AppSharedPreferences {
   final String filterLieu2 = "filterLieu2";
   final String filterMethode = "filterMethode";
 
-  final List<AbsenceModel> myabsences = [];
-
-  Future createFilterInfo(UserFilterModel userFilter) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setString(filterCountry1, userFilter.filterCountry1);
-  }
-
   Future<bool> setLanguage(String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await allTranslations.setNewLanguage(value);
@@ -100,10 +90,6 @@ class AppSharedPreferences {
     return prefs.getString(lastAUpdate) ?? "0";
   }
   */
-/*
-  Future<bool> addAbsence(AbsenceModel absenceModel) async{
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-  }*/
 
   Future<bool> loginFake(bool val) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -118,31 +104,6 @@ class AppSharedPreferences {
     return prefs.getBool(userLogin) ?? false;
   }
 
-  /* Future<bool> createLoginSession(UserInformationModel userInfo) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool response = true;
-    // if (userInfo.status.compareTo("000") == 0) {
-    // prefs.setBool(userLogin, true);
-    // } else {
-    // prefs.setBool(userLogin, false);
-    // }
-
-    // prefs.setString(userKey, userInfo.key);
-    // prefs.setInt(idcentre, userInfo.idcentre);
-    // prefs.setInt(defaultCentre, userInfo.defaultCentre);
-    // prefs.setString(nom, userInfo.nom);
-    // prefs.setString(prenoms, userInfo.prenoms);
-    // prefs.setString(email, userInfo.email);
-    // prefs.setString(telephoneuser, userInfo.telephoneuser);
-    // prefs.setString(photo, userInfo.photo);
-    // prefs.setString(datenaissance, userInfo.datenaissance);
-    // prefs.setString(adresseuser, userInfo.adresseuser);
-    // prefs.setString(profil, userInfo.typeuser);
-    // prefs.setInt(status, userInfo.status);
-    // prefs.setString(status, userInfo.status);
-    return response;
-  } */
-
   Future<String> getRegistrationId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(registrationId) ?? "";
@@ -151,12 +112,6 @@ class AppSharedPreferences {
   Future<bool> setRegistrationId(String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(registrationId, value);
-  }
-
-  Future<String> getUserKey() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    return prefs.getString(userKey) ?? "";
   }
 
   Future<LoginStatus> getConnectionState() async {
@@ -219,28 +174,6 @@ class AppSharedPreferences {
     return prefs.getString(defaultServerEndpoint) ??
         UserPreferences().localServer;
   }
-
-  /* Future<UserInformationModel> getUserInformation() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    UserInformationModel information = new UserInformationModel();
-    information.key = prefs.getString(userKey) ?? "";
-    // information.idcentre = prefs.getInt(idcentre) ?? 0;
-    // information.defaultCentre = prefs.getInt(defaultCentre) ?? 0;
-    information.nom = prefs.getString(nom) ?? "";
-    information.prenoms = prefs.getString(prenoms) ?? "";
-    information.email = prefs.getString(email) ?? "";
-    information.telephoneuser = prefs.getString(telephoneuser) ?? "";
-    information.photo = prefs.getString(photo) ?? "";
-    information.datenaissance = prefs.getString(datenaissance) ?? "";
-    information.adresseuser = prefs.getString(adresseuser) ?? "";
-    information.typeuser = prefs.getString(profil) ?? "";
-    information.authkey = prefs.getString(authkey) ?? "";
-    information.status = prefs.getInt(status) ?? 0;
-    // information.status = prefs.getString(status) ?? "000";
-
-    return information;
-  } */
 
   logout() async {
     UserPreferences().user = null;

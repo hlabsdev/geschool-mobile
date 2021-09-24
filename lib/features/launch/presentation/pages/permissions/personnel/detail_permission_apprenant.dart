@@ -12,10 +12,10 @@ import 'package:geschool/features/common/data/models/basemodels/centre_model.dar
 import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
-import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_fab.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_text.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'dart:math' as math;
 
 // ignore: must_be_immutable
 class DetailPermissionApprenant extends StatefulWidget {
@@ -39,7 +39,8 @@ class DetailPermissionApprenant extends StatefulWidget {
       _DetailPermissionApprenantState();
 }
 
-class _DetailPermissionApprenantState extends State<DetailPermissionApprenant> {
+class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
+    with TickerProviderStateMixin {
   ValidatePermDto validateDto = ValidatePermDto();
   AddPermissionDto addPermDto = AddPermissionDto();
   final formKey = GlobalKey<FormState>();
@@ -52,11 +53,16 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant> {
   TextEditingController _heuredebutController = TextEditingController();
   TextEditingController _datefinController = TextEditingController();
   TextEditingController _heurefinController = TextEditingController();
-
   var apprenantsFilter;
+
+  AnimationController controller;
 
   @override
   void initState() {
+    controller = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: this,
+    );
     validateDto.idCenter = widget.permission.idCenter;
     validateDto.uIdentifiant = widget.me.authKey;
     validateDto.permissionKey = widget.permission.keypermission;
@@ -254,15 +260,58 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant> {
           SizedBox(height: 20),
         ],
       ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: buildFab(widget.permission, widget.isApprenant),
+
+      /* floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            child: Icon(Icons.check_circle_rounded),
+            onPressed: () {
+              //...
+            },
+            heroTag: null,
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            child: Icon(Icons.cancel_rounded),
+            onPressed: () {
+              // _someFunc();
+            },
+            heroTag: null,
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            child: Icon(Icons.edit_rounded),
+            onPressed: () {
+              // _someFunc();
+            },
+            heroTag: null,
+          ),
+        ],
+      ), */
     );
   }
 
   Widget buildFab(PermissionApprenantModel permission, bool isApprenant) {
     Widget fab;
+    List<FabElement> icons = [
+      FabElement(
+        tooltip: "Accorder",
+        icon: Icons.check_circle_rounded,
+        backgroundColor: Colors.green,
+        forgroundColor: Colors.white,
+        onPressed: () => _confirmPermValidation(context, true),
+      ),
+      FabElement(
+        tooltip: "Refuser",
+        icon: Icons.cancel_rounded,
+        backgroundColor: Colors.redAccent,
+        forgroundColor: Colors.white,
+        onPressed: () => _confirmPermValidation(context, false),
+      ),
+    ];
 
-    // For aprenant case
     if (isApprenant == true || isApprenant == null) {
       if (permission.status == "2" || permission.status == "1") {
         fab = SizedBox(height: 0, width: 0);
@@ -274,49 +323,69 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant> {
           child: const Icon(Icons.edit_rounded),
         );
       }
-    }
-
-    // For personnel case satus 0
-    else if (isApprenant == false) {
+    } else if (isApprenant == false) {
       // Refusee ou directement enregistree
-      if (permission.status == "2" || permission.isdemande == "0") {
-        fab = SizedBox(height: 0, width: 0);
+      if (permission.status == "2") {
+        fab = null;
 
         //  satus 0: En attente
       } else if (permission.status == "0") {
-        fab = ExpandableFab(
-          distance: 100.0,
-          icon: const Icon(Icons.edit_rounded),
-          children: [
-            ActionButton(
-              onPressed: () {
-                _confirmPermValidation(context, true);
-              },
-              tooltip: "Accorder",
-              color: Colors.green[200],
-              icon: const Icon(
-                Icons.check_circle_rounded,
-                color: Colors.green,
-                size: 30,
+        fab = new Column(
+          mainAxisSize: MainAxisSize.min,
+          children: new List.generate(icons.length, (int index) {
+            Widget child = new Container(
+              height: 70.0,
+              width: 56.0,
+              alignment: FractionalOffset.topCenter,
+              child: new ScaleTransition(
+                scale: new CurvedAnimation(
+                  parent: controller,
+                  curve: new Interval(0.0, 1.0 - index / icons.length / 2.0,
+                      curve: Curves.easeOut),
+                ),
+                child: new FloatingActionButton(
+                  heroTag: null,
+                  backgroundColor: icons[index].backgroundColor,
+                  mini: true,
+                  tooltip: icons[index].tooltip,
+                  child: new Icon(icons[index].icon,
+                      color: icons[index].forgroundColor),
+                  onPressed: () {
+                    icons[index].onPressed();
+                  },
+                ),
+              ),
+            );
+            return child;
+          }).toList()
+            ..add(
+              new FloatingActionButton(
+                heroTag: null,
+                child: new AnimatedBuilder(
+                  animation: controller,
+                  builder: (BuildContext context, Widget child) {
+                    return new Transform(
+                      transform: new Matrix4.rotationZ(
+                          controller.value * 0.5 * math.pi),
+                      alignment: FractionalOffset.center,
+                      child: new Icon(
+                          controller.isDismissed ? Icons.menu : Icons.close),
+                    );
+                  },
+                ),
+                onPressed: () {
+                  if (controller.isDismissed) {
+                    controller.forward();
+                  } else {
+                    controller.reverse();
+                  }
+                },
               ),
             ),
-            ActionButton(
-              onPressed: () {
-                _confirmPermValidation(context, false);
-              },
-              tooltip: "Refuser",
-              color: Colors.red[200],
-              icon: const Icon(
-                Icons.cancel_rounded,
-                color: Colors.red,
-                size: 30,
-              ),
-            ),
-          ],
         );
       }
       // Staus 1: Accordee
-      else if (permission.status == "1") {
+      else if (permission.status == "1" && permission.isdemande == "0") {
         fab = FloatingActionButton(
           onPressed: () {
             showForm();
@@ -443,7 +512,7 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant> {
   _confirmPermValidation(BuildContext context, bool accepted) {
     showPlatformDialog(
       context: context,
-      builder: (_) => BasicDialogAlert(
+      builder: (context) => BasicDialogAlert(
         title: Text("Confirmer"),
         content: Text(
           "Confirmer " +
@@ -852,4 +921,19 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant> {
                 : Colors.grey[200];
     return result;
   }
+}
+
+class FabElement {
+  final String tooltip;
+  final IconData icon;
+  final Color backgroundColor;
+  final Color forgroundColor;
+  final void Function() onPressed;
+  const FabElement({
+    this.tooltip,
+    this.icon,
+    this.backgroundColor,
+    this.forgroundColor,
+    this.onPressed,
+  });
 }

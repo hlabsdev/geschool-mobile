@@ -1,7 +1,8 @@
-import 'package:date_picker_timeline/date_picker_timeline.dart';
+import 'package:calendar_timeline/calendar_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geschool/allTranslations.dart';
+import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/get_info_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
@@ -23,7 +24,6 @@ class MyTasks extends StatefulWidget {
 }
 
 class _MyTasksState extends State<MyTasks> {
-  final _datePickerKey = GlobalKey();
   List<TacheModel> information = [];
   List<TacheModel> mesInformations = [];
   List<TacheModel> tachesFilter = [];
@@ -34,11 +34,13 @@ class _MyTasksState extends State<MyTasks> {
   bool allChk = false;
   String sousTitreChecbox;
   SlidableController slidableController;
+  DateTime _selectedDay;
 
   @override
   void initState() {
     infoDto.uIdentifiant = widget.me.authKey;
     infoDto.registrationId = "";
+    _selectedDay = DateTime.now();
     getInfos();
     super.initState();
   }
@@ -84,7 +86,9 @@ class _MyTasksState extends State<MyTasks> {
       ),
       // bottomNavigationBar: BottomNavBar(),
       body: RefreshableWidget(
-        onRefresh: getInfos,
+        onRefresh: () {
+          getInfos();
+        },
         isLoading: isLoading,
         error: error,
         information: mesInformations,
@@ -102,17 +106,25 @@ class _MyTasksState extends State<MyTasks> {
             Card(
               margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
               color: Colors.yellow[200],
-              child: DatePicker(
-                DateTime.now().subtract(Duration(days: 100)),
-                key: _datePickerKey,
-                daysCount: 500,
-                initialSelectedDate: DateTime.now(),
-                locale: "fr-FR",
-                selectionColor: Colors.grey[700],
-                selectedTextColor: Colors.white,
-                onDateChange: (date) {
+              child: CalendarTimeline(
+                initialDate: _selectedDay,
+                firstDate: DateTime.now().subtract(Duration(days: 1000)),
+                lastDate: DateTime.now().add(Duration(days: 1000)),
+                dayNameColor: Colors.black,
+                onDateSelected: (date) {
+                  print(date);
+                  setState(() {
+                    _selectedDay = date;
+                  });
                   filterTache(date);
                 },
+                leftMargin: 20,
+                monthColor: Colors.blueGrey,
+                dayColor: Colors.black,
+                activeDayColor: Colors.white,
+                activeBackgroundDayColor: Grey,
+                dotsColor: Color(0xFF333A47),
+                locale: 'fr',
               ),
             ),
             Container(
@@ -165,11 +177,11 @@ class _MyTasksState extends State<MyTasks> {
   void filterTache(DateTime date) {
     setState(() {
       if (date != null) {
+        var taskdate = date.toString().split(" ")[0];
+        print(taskdate);
         tachesFilter.clear();
-        // tachesFilter = mesInformations
         tachesFilter = mesInformations
-            .filter(
-                (task) => DateTime.parse(task.dateTache).compareTo(date) == 0)
+            .filter((task) => task.dateTache.split(" ")[0] == (taskdate))
             .toList();
         allChk = false;
         // _datePickerKey.

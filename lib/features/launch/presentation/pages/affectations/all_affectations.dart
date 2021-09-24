@@ -8,7 +8,6 @@ import 'package:geschool/features/common/data/models/basemodels/user_model.dart'
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/refreshable_widget.dart';
 import 'package:geschool/features/launch/presentation/widgets/filter_pane_widget.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 // ignore: must_be_immutable
 class AllAffectations extends StatefulWidget {

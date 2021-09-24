@@ -66,21 +66,6 @@ class SimpleBarChart extends StatelessWidget {
               '\$ ${sales.sales.toString()}')
     ];
   }
-
-  /// Create one series with sample hard coded data.
-  /* static List<charts.Series<OrdinalSales, String>> _createBudgetData(listBudget) {
-    
-    return [
-      new charts.Series<BudgetEntry, String>(
-          id: 'Sales',
-          colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-          domainFn: (OrdinalSales sales, _) => sales.year,
-          measureFn: (OrdinalSales sales, _) => sales.sales,
-          data: data,
-          labelAccessorFn: (OrdinalSales sales, _) =>
-              '\$ ${sales.sales.toString()}')
-    ];
-  } */
 }
 
 /// Sample ordinal data type.

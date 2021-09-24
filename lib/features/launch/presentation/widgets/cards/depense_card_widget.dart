@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
-import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
+import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class DepenseCardWidget extends StatelessWidget {
-  final PermissionApprenantModel depense;
+  final DepenseModel depense;
   final Widget trailing;
   final Function onTap;
 
@@ -15,7 +16,8 @@ class DepenseCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: renderPermColor(int.tryParse(depense.status)),
+      // color: renderDepenseColor(int.tryParse(depense.status)),
+      color: renderDepenseColor(depense),
       child: ListTile(
         // tileColor: Colors.grey[300],
         leading:
@@ -43,8 +45,7 @@ class DepenseCardWidget extends StatelessWidget {
                 constraints: BoxConstraints(
                     maxWidth: (MediaQuery.of(context).size.width / 2.5)),
                 child: Text(
-                  FunctionUtils.convertFormatDate(
-                      depense.datedemandepermission),
+                  FunctionUtils.convertFormatDate(depense.datedemande),
                   style: TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -62,13 +63,17 @@ class DepenseCardWidget extends StatelessWidget {
               constraints: BoxConstraints(
                   maxWidth: (MediaQuery.of(context).size.width / 2)),
               child: Text(
-                depense.motifpermission,
+                depense.motifdemande,
                 style: TextStyle(color: GreenLight),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             // Montant
-            Text('Montant : ${depense.heuredebutpermission}'),
+            Text('Montant : ${depense.montantdepense}',
+                style: TextStyle(
+                    // color: Colors.blueAccent,
+                    // fontWeight: FontWeight.bold,
+                    )),
           ],
         ),
         trailing: trailing,
@@ -77,14 +82,22 @@ class DepenseCardWidget extends StatelessWidget {
     );
   }
 
-  renderPermColor(int etat) {
-    Color result = etat == 0
-        ? Colors.grey[400]
-        : etat == 1
-            ? Colors.green[200]
-            : etat == 2
-                ? Colors.red[200]
-                : Colors.grey[200];
+  // renderDepenseColor(int etat) {
+  renderDepenseColor(DepenseModel depense) {
+    Color result;
+    int etat = int.tryParse(depense.status);
+    if ((depense.datedepense.isEmptyOrNull) && (depense.status == "1")) {
+      result = Colors.white;
+    } else {
+      result = etat == 0
+          ? Colors.grey[400]
+          : etat == 1
+              ? Colors.green[200]
+              : etat == 2
+                  ? Colors.red[200]
+                  : Colors.grey[200];
+    }
+
     return result;
   }
 
