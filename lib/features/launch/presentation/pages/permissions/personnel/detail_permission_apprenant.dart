@@ -13,6 +13,7 @@ import 'package:geschool/features/common/data/models/basemodels/permission_appre
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_text.dart';
+import 'package:geschool/features/launch/presentation/widgets/decorations/fab_element.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'dart:math' as math;
@@ -293,6 +294,7 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
     );
   }
 
+// Construi les fab multiple
   Widget buildFab(PermissionApprenantModel permission, bool isApprenant) {
     Widget fab;
     List<FabElement> icons = [
@@ -311,7 +313,8 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
         onPressed: () => _confirmPermValidation(context, false),
       ),
     ];
-
+    // Pour un apprenant (Ou parent) il ne peut modifer
+    //que si la permission n'est pas encore traitee
     if (isApprenant == true || isApprenant == null) {
       if (permission.status == "2" || permission.status == "1") {
         fab = SizedBox(height: 0, width: 0);
@@ -323,8 +326,9 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
           child: const Icon(Icons.edit_rounded),
         );
       }
+      //On est icic dans le cadre d'un personnel
     } else if (isApprenant == false) {
-      // Refusee ou directement enregistree
+      // Refusee
       if (permission.status == "2") {
         fab = null;
 
@@ -384,7 +388,7 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
             ),
         );
       }
-      // Staus 1: Accordee
+      // Staus 1: Accordee mais directeme enregistrer par un personnel
       else if (permission.status == "1" && permission.isdemande == "0") {
         fab = FloatingActionButton(
           onPressed: () {
@@ -921,19 +925,4 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
                 : Colors.grey[200];
     return result;
   }
-}
-
-class FabElement {
-  final String tooltip;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color forgroundColor;
-  final void Function() onPressed;
-  const FabElement({
-    this.tooltip,
-    this.icon,
-    this.backgroundColor,
-    this.forgroundColor,
-    this.onPressed,
-  });
 }

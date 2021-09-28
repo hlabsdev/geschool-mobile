@@ -1,8 +1,8 @@
-import 'dart:async';
+/* import 'dart:async';
 
 import 'package:geschool/helpers/helpers_utils.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+// import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = new DatabaseHelper.internal();
@@ -56,3 +56,4 @@ class DatabaseHelper {
     try {} catch (error) {}
   }
 }
+ */

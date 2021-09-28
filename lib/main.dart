@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    DatabaseHelper.initDb();
+    // DatabaseHelper.initDb();
     super.initState();
     allTranslations.onLocaleChangedCallback = _onLocaleChanged;
     WidgetsBinding.instance.addPostFrameCallback((_) {});

@@ -62,7 +62,6 @@ class _DetailConduiteState extends State<DetailConduite> {
                   ListTile(
                     leading: Icon(
                       Icons.date_range,
-                      color: Colors.lime[600],
                       size: 30,
                     ),
                     contentPadding: EdgeInsets.only(right: 10, left: 5),
@@ -93,7 +92,6 @@ class _DetailConduiteState extends State<DetailConduite> {
                   ListTile(
                     leading: Icon(
                       Icons.date_range,
-                      color: Colors.lime[600],
                       size: 30,
                     ),
                     contentPadding: EdgeInsets.only(right: 10, left: 5),
@@ -126,7 +124,6 @@ class _DetailConduiteState extends State<DetailConduite> {
                       : ListTile(
                           leading: Icon(
                             Icons.format_align_justify,
-                            color: Colors.lime[600],
                             size: 30,
                           ),
                           contentPadding: EdgeInsets.only(right: 10, left: 5),

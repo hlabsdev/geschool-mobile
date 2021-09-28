@@ -621,7 +621,7 @@ class _AllTasksState extends State<AllTasks> {
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(
-            builder: (context, setState) {
+            builder: (_, setState) {
               return AlertDialog(
                 content: Stack(
                   children: <Widget>[tacheForm(context)],
@@ -648,8 +648,7 @@ class _AllTasksState extends State<AllTasks> {
                 ],
               );
             },
-          );
-          // });
+          ); //stf bulder
         }).then((value) => clearController());
   }
 
@@ -682,6 +681,7 @@ class _AllTasksState extends State<AllTasks> {
                   centres.length > 1
                       ? SearchableDropdown(
                           isExpanded: true,
+                          closeButton: "Fermer",
                           items: centres
                               .map((perso) => DropdownMenuItem(
                                     child: Text(perso.denominationCenter),
@@ -706,6 +706,7 @@ class _AllTasksState extends State<AllTasks> {
                   // DropdownButtonFormField<String>(
                   SearchableDropdown(
                     isExpanded: true,
+                    closeButton: "Fermer",
                     // items: personnelsFilter
                     items: personnelsFilter
                         .map((perso) => DropdownMenuItem(
@@ -801,7 +802,7 @@ class _AllTasksState extends State<AllTasks> {
                     },
                     validator: (value) {
                       if (value.isEmpty) {
-                        return allTranslations.text('pls_set_datetrappel');
+                        return allTranslations.text('pls_set_daterappel');
                       }
                       return null;
                     },

@@ -1,4 +1,4 @@
-import 'package:geschool/helpers/base_entity.dart';
+/* import 'package:geschool/helpers/base_entity.dart';
 import 'package:geschool/helpers/database_helper.dart';
 
 abstract class BaseRepository<T extends BaseEntity, PK> {
@@ -83,3 +83,4 @@ abstract class BaseRepository<T extends BaseEntity, PK> {
     return idForNewItem;
   }
 }
+ */

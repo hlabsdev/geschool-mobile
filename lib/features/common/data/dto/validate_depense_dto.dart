@@ -4,6 +4,7 @@ class ValidateDepenseDto {
   String cIdentifiant;
   String dIdentifiant;
   String operation;
+  String motif;
   String registrationId;
 
   ValidateDepenseDto({
@@ -11,6 +12,7 @@ class ValidateDepenseDto {
     this.uIdentifiant,
     this.cIdentifiant,
     this.operation,
+    this.motif,
     this.registrationId,
   });
 
@@ -20,6 +22,7 @@ class ValidateDepenseDto {
     this.cIdentifiant = json["c_identifiant"];
     this.dIdentifiant = json["d_identifiant"];
     this.operation = json["operation"];
+    this.motif = json["motif"];
     this.registrationId = json["registration_id"];
   }
 
@@ -30,6 +33,7 @@ class ValidateDepenseDto {
     data["c_identifiant"] = this.cIdentifiant;
     data["d_identifiant"] = this.dIdentifiant;
     data["operation"] = this.operation;
+    data["motif"] = this.motif;
     data["registration_id"] = this.registrationId;
     return data;
   }

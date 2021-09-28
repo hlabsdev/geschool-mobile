@@ -18,7 +18,6 @@ import 'package:geschool/features/launch/presentation/widgets/data_chart.dart';
 import 'package:geschool/features/launch/presentation/widgets/cards/budget_card_widget.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/refreshable_widget.dart';
 import 'package:geschool/features/launch/presentation/widgets/filter_pane_widget.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
@@ -54,13 +53,17 @@ class _AllBudgetsState extends State<AllBudgets> {
   List<AllDatas> informationPerCentre = [];
   List<DetailBudgetModel> budgetFilter = [];
 
+  /// Dans l'API c'est budget_saisie
+  int total_saisie_budgetaires_initial = 0;
+  int total_saisie_budgetaires = 0;
+
   /// Dans l'API c'est budget_recu
-  int total_detail_budgetaires_initial = 0;
-  int total_detail_budgetaires = 0;
+  int total_entree_budgetaires_initial = 0;
+  int total_entree_budgetaires = 0;
 
   /// Dans l'API c'est budget_prevision
-  int total_entres_initial = 0;
-  int total_entres = 0;
+  int budget_prevision_initial = 0;
+  int budget_prevision = 0;
   List<CentreModel> centres = [];
   List<NatureDons> natures = [];
   List<ModePaiement> modes = [];
@@ -84,10 +87,12 @@ class _AllBudgetsState extends State<AllBudgets> {
     infoDto.registrationId = "";
     budgetDto.uIdentifiant = widget.me.authKey;
     budgetDto.registrationId = "";
-    total_detail_budgetaires_initial = 0;
-    total_detail_budgetaires = 0;
-    total_entres_initial = 0;
-    total_entres = 0;
+    total_saisie_budgetaires_initial = 0;
+    total_entree_budgetaires_initial = 0;
+    budget_prevision_initial = 0;
+    total_entree_budgetaires = 0;
+    total_saisie_budgetaires = 0;
+    budget_prevision = 0;
     getInfos();
     super.initState();
   }
@@ -133,8 +138,11 @@ class _AllBudgetsState extends State<AllBudgets> {
             SingleFilterPaneWidget(
               hint: centreController.text == ""
                   ? Text("Centre")
-                  : Text(FunctionUtils.getCenterNameByKey(
-                      centreController.text, centres)),
+                  : Text(
+                      FunctionUtils.getCenterNameByKey(
+                          centreController.text, centres),
+                      textAlign: TextAlign.center,
+                    ),
               isSearchable: false,
               items: centres
                   .map((centre) => DropdownMenuItem(
@@ -175,7 +183,7 @@ class _AllBudgetsState extends State<AllBudgets> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  "Detail budgetaires",
+                  "Liste des détails du Budget",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -189,11 +197,11 @@ class _AllBudgetsState extends State<AllBudgets> {
             ConstrainedBox(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width / 2),
-              child: Text(
-                  'Graphe comparant les entrés et le \ntotal des détails budgetaires',
+              child: Text("Résumé des entrées",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             ),
+            SizedBox(height: 10, width: 0),
             Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width - 50,
@@ -236,29 +244,42 @@ class _AllBudgetsState extends State<AllBudgets> {
           modes.clear();
           informationPerCentre.clear();
           information.clear();
-          informationPerCentre = value.information.allDatas;
           centres = value.information.centers;
           natures = value.information.natureDons;
           modes = value.information.modePaiement;
-          total_detail_budgetaires_initial = 0;
-          total_entres_initial = 0;
-          for (var item in informationPerCentre) {
-            information.addAll(item.datas);
-            if (item.budgetRecu != null)
-              total_detail_budgetaires_initial += item.budgetRecu;
-            if (item.budgetPrevision != null)
-              total_entres_initial += item.budgetPrevision;
+          //Pour s'assurer qu'il ya des donnees
+          if (value.information.allDatas.length > 0) {
+            informationPerCentre = value.information.allDatas;
+            total_saisie_budgetaires_initial = 0;
+            budget_prevision_initial = 0;
+            // Initialisation des donnee du graphe 1
+            for (var item in informationPerCentre) {
+              information.addAll(item.datas);
+              if (item.budgetSaisie != null)
+                total_saisie_budgetaires_initial += item.budgetSaisie;
+              if (item.budgetPrevision != null)
+                budget_prevision_initial += item.budgetPrevision;
+              if (item.budgetRecu != null)
+                total_entree_budgetaires_initial += item.budgetRecu;
+            }
+            information.sort((a, b) => DateTime.tryParse(b.dateOperation)
+                .compareTo(DateTime.tryParse(a.dateOperation)));
+            // Initialisation des donnee du graphe 2
+            total_entree_budgetaires = total_entree_budgetaires_initial;
+            total_saisie_budgetaires = total_saisie_budgetaires_initial;
+            budget_prevision = budget_prevision_initial;
+            if (budgetFilter.length > 0) budgetFilter.clear();
+            budgetFilter.addAll(information);
+            allChk = true;
+            budgetFilter.sort((a, b) => DateTime.tryParse(b.dateOperation)
+                .compareTo(DateTime.tryParse(a.dateOperation)));
+            centreController.text = centres.first.keyCenter;
+            filterInfo(false, centreController.text);
           }
-          information.sort((a, b) => DateTime.tryParse(b.dateOperation)
-              .compareTo(DateTime.tryParse(a.dateOperation)));
-          total_detail_budgetaires = total_detail_budgetaires_initial;
-          total_entres = total_entres_initial;
-          if (budgetFilter.length > 0) budgetFilter.clear();
-          budgetFilter.addAll(information);
-          allChk = true;
-
-          budgetFilter.sort((a, b) => DateTime.tryParse(b.dateOperation)
-              .compareTo(DateTime.tryParse(a.dateOperation)));
+          //S'il ya -as de donnees [information] doit etre initialiser a une liste vide pourpouvoir gerer l'affichage
+          else {
+            information = [];
+          }
         });
       },
     );
@@ -325,10 +346,10 @@ class _AllBudgetsState extends State<AllBudgets> {
         dto: budgetDto,
         repositoryFunction: api.sendBudget,
         clearController: clearController,
+        isAForm: true,
         onSuccess: (a) {
           ///On ferme le formulaire
-          Navigator.of(context).pop(null);
-
+          // Navigator.of(context).pop(null);
           getInfos();
           /* setState(() {
             information.clear();
@@ -348,22 +369,25 @@ class _AllBudgetsState extends State<AllBudgets> {
   buildGraph() {
     // prin
     var data = [
-      new BudgetEntry("Entrés", total_entres,
+      new BudgetEntry("Budget prévisionnel", budget_prevision,
+          charts.MaterialPalette.blue.shadeDefault),
+      new BudgetEntry("Total des\nentrées", total_entree_budgetaires,
           charts.MaterialPalette.deepOrange.shadeDefault),
-      new BudgetEntry("Détails budgetaires", total_detail_budgetaires,
-          charts.MaterialPalette.gray.shade800),
+      new BudgetEntry("Total des\nsaisies budgetaires",
+          total_saisie_budgetaires, charts.MaterialPalette.gray.shade800),
     ];
 
     var serieList = [
       new charts.Series<BudgetEntry, String>(
-        id: "Budgets",
-        // colorFn: (_, __) => charts.MaterialPalette.deepOrange.shadeDefault,
-        colorFn: (BudgetEntry budgets, _) => budgets.color,
-        domainFn: (BudgetEntry budgets, _) => budgets.denomination.toString(),
-        measureFn: (BudgetEntry budgets, _) => budgets.montant,
-        data: data,
-        labelAccessorFn: (BudgetEntry budgets, _) => "${budgets.montant} F CFA",
-      )
+          id: "Budgets",
+          // colorFn: (_, __) => charts.MaterialPalette.deepOrange.shadeDefault,
+          colorFn: (BudgetEntry budgets, _) => budgets.color,
+          domainFn: (BudgetEntry budgets, _) => budgets.denomination.toString(),
+          measureFn: (BudgetEntry budgets, _) => budgets.montant,
+          data: data,
+          // labelAccessorFn: (BudgetEntry budgets, _) =>"${budgets.montant} F CFA",
+          labelAccessorFn: (BudgetEntry budgets, _) =>
+              FunctionUtils.formatMontant(budgets.montant))
     ];
 
     return SimpleBarChart(
@@ -376,6 +400,8 @@ class _AllBudgetsState extends State<AllBudgets> {
     filterInfo(true);
   }
 
+  /// prend le key du centre (Optionnel), et le key de l'apprenant(optionnel)
+  /// parametre obligatoire: true quie est un booleen indiquand si on est entrain de tout afficher ou de filtrer par l'un des parametre optionelle
   void filterInfo(bool tout, [String centre, String apprenant]) {
     setState(() {
       if (!tout) {
@@ -383,8 +409,9 @@ class _AllBudgetsState extends State<AllBudgets> {
         AllDatas centreData = informationPerCentre
             .firstWhere((oneCentre) => (oneCentre.keyCenter == centre));
         budgetFilter = centreData.datas;
-        total_detail_budgetaires = centreData.budgetRecu ?? 0;
-        total_entres = centreData.budgetPrevision ?? 0;
+        total_entree_budgetaires = centreData.budgetRecu ?? 0;
+        total_saisie_budgetaires = centreData.budgetSaisie ?? 0;
+        budget_prevision = centreData.budgetPrevision ?? 0;
         allChk = false;
       } else {
         _centreController.text = "";
@@ -392,8 +419,9 @@ class _AllBudgetsState extends State<AllBudgets> {
         if (budgetFilter.length > 0) budgetFilter.clear();
         // budgetFilter.addAll(mesInformations);
         budgetFilter.addAll(information);
-        total_detail_budgetaires = total_detail_budgetaires_initial;
-        total_entres = total_entres_initial;
+        total_entree_budgetaires = total_entree_budgetaires_initial;
+        total_saisie_budgetaires = total_saisie_budgetaires_initial;
+        budget_prevision = budget_prevision_initial;
         allChk = true;
       }
     });
@@ -425,7 +453,7 @@ class _AllBudgetsState extends State<AllBudgets> {
 
     centres.length == 1
         ? _centreController.text = centres.first.keyCenter
-        : debugPrint('');
+        : debugPrint('pluiseur centres');
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -433,7 +461,7 @@ class _AllBudgetsState extends State<AllBudgets> {
             builder: (context, setState) {
               return AlertDialog(
                 content: Stack(
-                  children: <Widget>[permForm(context)],
+                  children: <Widget>[budgetForm(context)],
                 ),
                 scrollable: true,
                 actions: [
@@ -469,29 +497,36 @@ class _AllBudgetsState extends State<AllBudgets> {
               );
             },
           );
-          // });
         }).then((value) => clearController());
   }
 
   /// Confirmer l'accord ou le refus d'une permission
   // confirmDeleteTask(BuildContext context, PermissionApprenantModel permission) {
-  Form permForm(BuildContext context) {
+  Form budgetForm(BuildContext context) {
     return Form(
       key: formKey,
       child: Column(
         children: [
           // Centre
           centres.length > 1
-              ? SearchableDropdown(
+              // ? SearchableDropdown(
+              ? DropdownButtonFormField(
                   isExpanded: true,
+                  // closeButton: "Fermer",
                   items: centres
                       .map((center) => DropdownMenuItem(
                             child: Text(center.denominationCenter),
                             value: center.denominationCenter,
                           ))
                       .toList(),
+                  // value: centreController.te,
                   hint: Text("Centre"),
+
                   onChanged: (value) {
+                    // if (value.isEmptyOrNull) {
+                    //   FunctionUtils.displaySnackBar(
+                    //       context, allTranslations.text('pls_set_center'));
+                    // }
                     setState(() {
                       _centreController.text =
                           FunctionUtils.getCenterKey(value, centres).toString();
@@ -510,6 +545,10 @@ class _AllBudgetsState extends State<AllBudgets> {
                 .toList(),
             hint: Text("Nature des fonds"),
             onChanged: (value) {
+              // if (value.isEmptyOrNull) {
+              //   FunctionUtils.displaySnackBar(
+              //       context, allTranslations.text('pls_set_nature'));
+              // }
               setState(() {
                 _natureController.text = value;
               });
@@ -526,6 +565,10 @@ class _AllBudgetsState extends State<AllBudgets> {
                 .toList(),
             hint: Text("Mode de paiement"),
             onChanged: (value) {
+              // if (value.isEmptyOrNull) {
+              //   FunctionUtils.displaySnackBar(
+              //       context, allTranslations.text('pls_set_modepaiement'));
+              // }
               setState(() {
                 _modePaiementController.text = value;
               });

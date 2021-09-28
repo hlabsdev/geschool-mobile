@@ -109,12 +109,12 @@ class _MyStudentConduiteState extends State<MyStudentConduite> {
         value.all((a) {
           if (a != null && a.status.compareTo("000") == 0) {
             //enregistrement des informations de recuperes
-            // setState(() {
-            information = a.information;
-            nbElev = a.information.length;
-            // });
-            print(information.length);
-            print(nbElev);
+            setState(() {
+              information = a.information;
+              nbElev = a.information.length;
+            });
+            print("length: ${information.length}");
+            print("nbr Eleve: $nbElev");
             loading(false);
             return true;
           } else {
@@ -140,24 +140,28 @@ class _MyStudentConduiteState extends State<MyStudentConduite> {
 
   genTabBar() {
     List<Widget> tabs = [];
-    for (var item in information) {
+    for (var infos in information) {
       print(information.length);
-      String classe =
-          item.classe.libellespecialite + " " + item.classe.libelleclasse;
-      tabs.add(
-        Tab(
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Text("${item.nom}\n ",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text("Classe: $classe",
-                  style: TextStyle(fontSize: 13), textAlign: TextAlign.center),
-            ],
+      if (infos != null) {
+        String classe = infos.classe == null
+            ? "..."
+            : "${infos.classe.libellespecialite} ${infos.classe.libelleclasse}";
+        tabs.add(
+          Tab(
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Text("${infos.nom}\n ",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text("Classe: $classe",
+                    style: TextStyle(fontSize: 13),
+                    textAlign: TextAlign.center),
+              ],
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
     return tabs;
   }

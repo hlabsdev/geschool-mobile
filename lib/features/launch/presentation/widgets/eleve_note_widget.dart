@@ -182,7 +182,7 @@ class _EleveNoteWidgetState extends State<EleveNoteWidget> {
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 DataTable(
-                  columnSpacing: 45,
+                  columnSpacing: 20,
                   sortColumnIndex: sortIndex,
                   sortAscending: asc,
                   columns: [

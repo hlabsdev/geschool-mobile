@@ -67,7 +67,7 @@ class BudgetCardWidget extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     // Somme
                     child: Text(
-                      "Somme:",
+                      "Montant:",
                       style: TextStyle(
                           // fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -98,13 +98,14 @@ class BudgetCardWidget extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment.bottomRight,
-                    // Somme
+                    // Montant
                     child: Text(
-                      (budget.montantOperation),
+                      FunctionUtils.formatMontant(
+                          (int.tryParse(budget.montantOperation))),
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: Colors.blueGrey[800]),
+                          color: Colors.blue[300]),
                     ),
                   ),
                 ],

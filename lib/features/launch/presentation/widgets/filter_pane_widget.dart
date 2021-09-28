@@ -52,7 +52,9 @@ class _SingleFilterPaneWidgetState extends State<SingleFilterPaneWidget> {
         children: [
           Container(
             constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width / 2.3),
+              maxWidth: MediaQuery.of(context).size.width / 1.7,
+              maxHeight: MediaQuery.of(context).size.width / 3,
+            ),
             child: widget.isSearchable
                 ? SearchableDropdown(
                     closeButton: "Fermer",
@@ -77,7 +79,7 @@ class _SingleFilterPaneWidgetState extends State<SingleFilterPaneWidget> {
           ),
           Container(
             constraints: BoxConstraints(
-                maxWidth: (MediaQuery.of(context).size.width / 2.3),
+                maxWidth: (MediaQuery.of(context).size.width / 3.5),
                 maxHeight: (MediaQuery.of(context).size.width / 5)),
             color: Colors.grey[100],
             child: CheckboxListTile(

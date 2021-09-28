@@ -1,4 +1,3 @@
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -11,7 +10,6 @@ import 'package:geschool/features/common/data/dto/validate_depense_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
-import 'package:geschool/features/common/data/models/basemodels/permission_apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/centre_response_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/depense_list_response_model.dart';
@@ -22,7 +20,6 @@ import 'package:geschool/features/launch/presentation/widgets/cards/depense_card
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:geschool/features/launch/presentation/widgets/decorations/refreshable_widget.dart';
 import 'package:geschool/features/launch/presentation/widgets/filter_pane_widget.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 // ignore: must_be_immutable
@@ -44,11 +41,6 @@ class _AllDepensesState extends State<AllDepenses> {
   bool isLoading;
   bool error = false;
   bool isAdmin = false;
-  var data = [
-    {"Saisie budgetaires", 6180000},
-    {"Paiement scolarite", 110000},
-    {"Total prestations", 2351135},
-  ];
 
   /* Imported prepared for parsing deb */
 
@@ -65,18 +57,8 @@ class _AllDepensesState extends State<AllDepenses> {
   List<Sections> sections = [];
 
   /* For form deb */
-  TextEditingController _centreController = TextEditingController();
-  TextEditingController _apprenantController = TextEditingController();
   TextEditingController _motifController = TextEditingController();
-  TextEditingController _datedemandeController = TextEditingController();
-  TextEditingController _datedebutController = TextEditingController();
-  TextEditingController _heuredebutController = TextEditingController();
-  TextEditingController _datefinController = TextEditingController();
-  TextEditingController _heurefinController = TextEditingController();
   /* For form end */
-  TextEditingController periodeController = TextEditingController();
-  TextEditingController classeController = TextEditingController();
-  TextEditingController matiereController = TextEditingController();
 
   SlidableController slidableController;
   Icon _arrowLeft = Icon(Icons.keyboard_arrow_left_rounded);
@@ -106,9 +88,13 @@ class _AllDepensesState extends State<AllDepenses> {
   @override
   Widget build(BuildContext context) {
     List<dynamic> etatDepense = [
-      ["Demandes en attentes", attente, Colors.grey[300]],
-      ["Demandes en cours de décaissements", decaissement, Colors.green[100]],
-      ["Demandes Traitées", refus, Colors.red[100]],
+      ["Demandes en attentes de validation", attente, Colors.grey[100]],
+      [
+        "Demandes en attentes de décaissements",
+        decaissement,
+        Colors.green[100]
+      ],
+      ["Demandes Traitées", refus, Colors.grey[200]],
     ];
     return Scaffold(
       appBar: AppBar(
@@ -143,7 +129,11 @@ class _AllDepensesState extends State<AllDepenses> {
             SingleFilterPaneWidget(
               hint: centreController.text == ""
                   ? Text("Centre")
-                  : Text((centreController.text)),
+                  : Text(
+                      FunctionUtils.getCenterNameByKey(
+                          centreController.text, centres),
+                      textAlign: TextAlign.center,
+                    ),
               isSearchable: false,
               items: centres
                   .map((centre) => DropdownMenuItem(
@@ -215,34 +205,61 @@ class _AllDepensesState extends State<AllDepenses> {
                             controller: slidableController,
                             actionPane: SlidableDrawerActionPane(),
                             secondaryActions: <Widget>[
-                              IconSlideAction(
-                                caption: 'Detail',
-                                color: Grey,
-                                icon: Icons.remove_red_eye_rounded,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          DetailDepense(
-                                        me: widget.me,
-                                        depense: curentDepense[1][i],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              curentDepense[1][i].status == "2"
+                              DepenseCardWidget.isTreated(curentDepense[1][i])
                                   ? SizedBox(height: 0, width: 0)
                                   : IconSlideAction(
-                                      caption: 'Plus',
-                                      color: GreenLight,
-                                      icon: Icons.edit,
+                                      caption: 'Detail',
+                                      color: Grey,
+                                      icon: Icons.remove_red_eye_rounded,
                                       onTap: () {
-                                        _moreAction(
-                                            context, curentDepense[1][i]);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                DetailDepense(
+                                              me: widget.me,
+                                              section: sections.firstWhere(
+                                                  (sect) =>
+                                                      sect.keysection ==
+                                                      curentDepense[1][i]
+                                                          .keysection),
+                                              depense: curentDepense[1][i],
+                                              centre: centres.firstWhere(
+                                                  (centre) =>
+                                                      centre
+                                                          .idCenter
+                                                          .toString() ==
+                                                      curentDepense[1][i]
+                                                          .idcentre),
+                                            ),
+                                          ),
+                                        );
                                       },
                                     ),
+                              DepenseCardWidget.isTreated(curentDepense[1][i])
+                                  ? SizedBox(height: 0, width: 0)
+                                  : curentDepense[1][i].status == "1"
+                                      ? IconSlideAction(
+                                          caption: 'Décaisser',
+                                          color: GreenLight,
+                                          icon: Icons.money_rounded,
+                                          onTap: () {
+                                            _confirmValidation(
+                                                context,
+                                                curentDepense[1][i],
+                                                true,
+                                                true);
+                                          },
+                                        )
+                                      : IconSlideAction(
+                                          caption: 'Plus',
+                                          color: GreenLight,
+                                          icon: Icons.edit,
+                                          onTap: () {
+                                            _moreAction(
+                                                context, curentDepense[1][i]);
+                                          },
+                                        ),
                             ],
                             child: DepenseCardWidget(
                               onTap: () {
@@ -256,12 +273,18 @@ class _AllDepensesState extends State<AllDepenses> {
                                           sect.keysection ==
                                           curentDepense[1][i].keysection),
                                       depense: curentDepense[1][i],
+                                      centre: centres.firstWhere((centre) =>
+                                          centre.idCenter.toString() ==
+                                          curentDepense[1][i].idcentre),
                                     ),
                                   ),
                                 );
                               },
                               depense: curentDepense[1][i],
-                              trailing: _arrowLeft,
+                              trailing: DepenseCardWidget.isTreated(
+                                      curentDepense[1][i])
+                                  ? null
+                                  : _arrowLeft,
                             ),
                           ),
                       growable: true),
@@ -382,7 +405,9 @@ class _AllDepensesState extends State<AllDepenses> {
           infoFilter = information;
           separate(infoFilter);
           allChk = true;
+          centreController.text = centres.first.keyCenter;
         });
+        filterInfo(false, centreController.text);
       },
     );
     getCentres();
@@ -419,6 +444,7 @@ class _AllDepensesState extends State<AllDepenses> {
         validateDto.operation = accorded ? "1" : "2";
       }
     });
+    print(validateDto.toJson());
     Api api = ApiRepository();
     FunctionUtils.sendData(
         context: context,
@@ -426,63 +452,13 @@ class _AllDepensesState extends State<AllDepenses> {
         repositoryFunction: api.validateDepense,
         clearController: clearController,
         onSuccess: (a) {
+          if (!accorded) {
+            Navigator.of(context).pop(null);
+          }
           getInfos();
         },
         onFailure: () {});
   }
-
-  /* validate0(bool accorded) async {
-    setState(() {
-      validateDto.operation = accorded ? "1" : "2";
-    });
-    print("user changing...");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(allTranslations.text('processing')),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator(
-                    // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
-                    )
-              ],
-            ),
-          );
-        });
-
-    Api api = ApiRepository();
-    api.validatePerm(validateDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de l'utilisateur dans la session
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 1);
-            return true;
-          } else {
-            //l'api a retourne une Erreur
-            Navigator.of(context).pop(null);
-
-            FunctionUtils.displaySnackBar(context, a.message, type: 0);
-            return false;
-          }
-        });
-      } else {
-        Navigator.of(context).pop(null);
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    });
-  } */
 
   sendDepense() {
     Api api = ApiRepository();
@@ -500,72 +476,6 @@ class _AllDepensesState extends State<AllDepenses> {
         onFailure: () {});
   }
 
-/* 
-  sendPerm() async {
-    print("user changing...");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(allTranslations.text('processing')),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator(
-                    // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
-                    )
-              ],
-            ),
-          );
-        });
-    Api api = ApiRepository();
-    api.sendPerm(addPermDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de l'utilisateur dans la session
-            Navigator.of(context).pop(null);
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 1);
-            clearController();
-            setState(() {
-              information = a.information;
-              /* Listes */
-              matiereController.text = "";
-              classeController.text = "";
-              periodeController.text = "";
-              if (infoFilter.length > 0) infoFilter.clear();
-              infoFilter.addAll(information);
-              allChk = true;
-
-              infoFilter.sort((a, b) =>
-                  a.datedemandepermission.compareTo(b.datedemandepermission));
-            });
-            return true;
-          } else {
-            //l'api a retourne une Erreur
-            Navigator.of(context).pop(null);
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 0);
-            return false;
-          }
-        });
-      } else {
-        Navigator.of(context).pop(null);
-        Navigator.of(context).pop(null);
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    });
-  } */
-
   void listAll() {
     filterInfo(true);
   }
@@ -573,28 +483,25 @@ class _AllDepensesState extends State<AllDepenses> {
   buildGraph() {
     // prin
     var data = [
-      new BudgetEntry("Budget\nPrévisionnel", infoFilter.budgetPrevision,
+      new BudgetEntry("Budget\nprévisionnel", infoFilter.budgetPrevision,
           charts.MaterialPalette.yellow.shadeDefault),
-      new BudgetEntry("Total\nEntrées", infoFilter.budgetRecu,
+      new BudgetEntry("Total des\nentrées", infoFilter.budgetRecu,
           charts.MaterialPalette.blue.shadeDefault),
-      new BudgetEntry("Budget\nDépenses", infoFilter.budgetDepense,
-          charts.MaterialPalette.gray.shadeDefault),
-      new BudgetEntry("Plafond", infoFilter.budgetPlafond,
-          charts.MaterialPalette.deepOrange.shadeDefault),
       new BudgetEntry("Total\nDépenses", infoFilter.totalDepense,
           charts.MaterialPalette.red.shadeDefault),
+      new BudgetEntry("Dépenses\nétablissement", infoFilter.budgetDepense,
+          charts.MaterialPalette.gray.shadeDefault),
     ];
 
     var serieList = [
       new charts.Series<BudgetEntry, String>(
-        id: "Depenses",
-        colorFn: (BudgetEntry budgets, _) => budgets.color,
-        domainFn: (BudgetEntry budgets, _) => budgets.denomination.toString(),
-        measureFn: (BudgetEntry budgets, _) => budgets.montant,
-        data: data,
-        labelAccessorFn: (BudgetEntry budgets, _) => "${budgets.montant} FCFA",
-        overlaySeries: false,
-      )
+          id: "Depenses",
+          colorFn: (BudgetEntry budgets, _) => budgets.color,
+          domainFn: (BudgetEntry budgets, _) => budgets.denomination.toString(),
+          measureFn: (BudgetEntry budgets, _) => budgets.montant,
+          data: data,
+          labelAccessorFn: (BudgetEntry budgets, _) =>
+              FunctionUtils.formatMontant(budgets.montant)),
     ];
 
     return SimpleBarChart(
@@ -626,68 +533,60 @@ class _AllDepensesState extends State<AllDepenses> {
   }
 
   void clearController() {
-    _centreController.text = "";
-    _apprenantController.text = "";
     _motifController.text = "";
-    _datedebutController.text = "";
-    _datefinController.text = "";
-    _heuredebutController.text = "";
-    _heurefinController.text = "";
-    _datedemandeController.text = "";
   }
 
-  showForm(BuildContext context, PermissionApprenantModel depense) {
-    if (depense != null) {
-      _centreController.text = depense.idCenter.toString();
-      _apprenantController.text = depense.keyapprenant;
-      _motifController.text = depense.motifpermission;
-      _datedebutController.text = depense.datedebutpermission;
-      _datefinController.text = depense.datefinpermission;
-      _heuredebutController.text = depense.heuredebutpermission;
-      _heurefinController.text = depense.heurefinpermission;
-      _datedemandeController.text = depense.datedemandepermission;
-      addPermDto.permissionKey = depense.keypermission;
-      addPermDto.operation = "2";
-    } else {
-      addPermDto.operation = "1";
-    }
-
+  showForm(BuildContext context, DepenseModel depense) {
     showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        // title: Text("Confirmer"),
-        content: Container(
-          constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height / 1.5),
-          child: permForm(context),
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                content: refusForm(context),
+                scrollable: true,
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("Annuler"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                    child: Text("Valider"),
+                    onPressed: () {
+                      if (formKey.currentState.validate()) {
+                        setState(() {
+                          validateDto.motif = _motifController.text ?? "";
+                        });
+                        validate(false, false);
+                      }
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        });
+  }
+
+  Form refusForm(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: TextFormField(
+        controller: _motifController,
+        maxLines: 50,
+        minLines: 1,
+        decoration: InputDecoration(
+          contentPadding: Vx.m2,
+          labelText: "Motif du refus",
         ),
-        actions: <Widget>[
-          TextButton(
-            child: Text("Annuler"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: Text("Valider"),
-            onPressed: () {
-              setState(() {
-                addPermDto.idCenter = _centreController.text;
-                addPermDto.keyApprenant = _apprenantController.text;
-                addPermDto.motif = _motifController.text ?? "";
-                addPermDto.dateDemande =
-                    _datedemandeController.text.split(" ")[0] ?? "";
-                addPermDto.dateDebut =
-                    _datedebutController.text.split(" ")[0] ?? "";
-                addPermDto.dateFin =
-                    _datefinController.text.split(" ")[0] ?? "";
-                addPermDto.heureDebut = _heuredebutController.text ?? "";
-                addPermDto.heureFin = _heurefinController.text ?? "";
-              });
-              sendDepense();
-            },
-          ),
-        ],
+        validator: (value) {
+          if (value.isEmptyOrNull) {
+            return "Veillez renseigner la raison du refus";
+          }
+          return null;
+        },
       ),
     );
   }
@@ -726,7 +625,11 @@ class _AllDepensesState extends State<AllDepenses> {
               });
               Navigator.of(context).pop(null);
               print("Devrait se fermer");
-              validate(accepted, decaisser);
+              if (!accepted) {
+                showForm(context, depense);
+              } else {
+                validate(accepted, decaisser);
+              }
             },
           ),
         ],
@@ -749,9 +652,6 @@ class _AllDepensesState extends State<AllDepenses> {
               color: Grey,
             ),
             title: Text('Aucune action supplémentaire disponible'),
-            /* onTap: () {
-                // showRapportForm(depense);
-              }, */
           ));
         } else if (depense.status == "0") {
           listAction.add(ListTile(
@@ -761,6 +661,7 @@ class _AllDepensesState extends State<AllDepenses> {
             ),
             title: Text('Accorder'),
             onTap: () {
+              Navigator.of(context).pop(null);
               _confirmValidation(context, depense, true, false);
             },
           ));
@@ -771,6 +672,7 @@ class _AllDepensesState extends State<AllDepenses> {
             ),
             title: Text('Refuser'),
             onTap: () {
+              Navigator.of(context).pop(null);
               _confirmValidation(context, depense, false, false);
             },
           ));
@@ -782,6 +684,7 @@ class _AllDepensesState extends State<AllDepenses> {
             ),
             title: Text('Décaisser'),
             onTap: () {
+              Navigator.of(context).pop(null);
               _confirmValidation(context, depense, true, true);
             },
           ));
@@ -793,6 +696,7 @@ class _AllDepensesState extends State<AllDepenses> {
             ),
             title: Text('Refuser'),
             onTap: () {
+              Navigator.of(context).pop(null);
               _confirmValidation(context, depense, false, false);
             },
           ));
@@ -807,142 +711,6 @@ class _AllDepensesState extends State<AllDepenses> {
           children: listAction,
         );
       },
-    );
-  }
-
-  Form permForm(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: ListView(
-        children: [
-          centres.length > 1
-              ? SearchableDropdown(
-                  isExpanded: true,
-                  items: centres
-                      .map((perso) => DropdownMenuItem(
-                            child: Text(perso.denominationCenter),
-                            value: perso.denominationCenter,
-                          ))
-                      .toList(),
-                  hint: _centreController.text == ""
-                      ? Text("Centre")
-                      : Text(FunctionUtils.getCenterName(
-                          int.parse(_centreController.text), centres)),
-                  onChanged: (value) {
-                    setState(() {
-                      _centreController.text =
-                          FunctionUtils.getCenterId(value, centres).toString();
-                    });
-                  },
-                ).py12()
-              : SizedBox(height: 0),
-          // DropdownButtonFormField<String>(
-          TextFormField(
-            controller: _motifController,
-            decoration: InputDecoration(
-              contentPadding: Vx.m2,
-              // border: OutlineInputBorder(),
-              labelText: allTranslations.text('motif'),
-              // prefixIcon: Icon(Icons.description),
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return allTranslations.text('pls_set_motif');
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _datedemandeController,
-            decoration: InputDecoration(
-              contentPadding: Vx.m2,
-              // border: OutlineInputBorder(),
-              labelText: _datedemandeController.text.isEmptyOrNull
-                  ? allTranslations.text('datedemande')
-                  : FunctionUtils.convertFormatDate(
-                      _datedemandeController.text),
-              // prefixIcon: Icon(Icons.description),
-            ),
-            readOnly: true,
-            onTap: () {
-              FunctionUtils.selectDate(
-                  context, _datedemandeController, DateTime.now());
-            },
-            validator: (value) {
-              if (value.isEmpty) {
-                return allTranslations.text('pls_set_datedemande');
-              }
-              return null;
-            },
-          ),
-          DateTimePicker(
-            type: DateTimePickerType.dateTimeSeparate,
-            // cursorColor: GreenLight,
-            timeFieldWidth: 55,
-            dateMask: 'd MMM, yyyy',
-            controller: _datedebutController,
-            locale: Locale('fr'),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-            icon: Icon(Icons.date_range),
-            use24HourFormat: true,
-            validator: (value) {
-              if (value.isEmpty) {
-                return allTranslations.text('pls_set_datedebut');
-              }
-              return null;
-            },
-            dateLabelText: 'Date Début',
-            timeLabelText: "Heure",
-            onChanged: (val) {
-              print(val);
-              setState(() {
-                _datedebutController.text = val.toString().split(".")[0];
-                _heuredebutController.text = val.toString().split(" ")[1];
-              });
-            },
-            onSaved: (val) {
-              print(val);
-              setState(() {
-                _datedebutController.text = val.toString().split(".")[0];
-                _heuredebutController.text = val.toString().split(" ")[1];
-              });
-            },
-          ).py12(),
-          DateTimePicker(
-            type: DateTimePickerType.dateTimeSeparate,
-            timeFieldWidth: 55,
-            dateMask: 'd MMM, yyyy',
-            controller: _datefinController,
-            locale: Locale('fr'),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-            icon: Icon(Icons.event),
-            dateLabelText: 'Date Fin',
-            timeLabelText: "Heure",
-            onChanged: (val) {
-              print(val);
-              setState(() {
-                _datefinController.text = val.toString().split(".")[0];
-                _heurefinController.text = val.toString().split(" ")[1];
-              });
-            },
-            validator: (value) {
-              if (value.isEmpty) {
-                return allTranslations.text('pls_set_datefin');
-              }
-              return null;
-            },
-            onSaved: (val) {
-              print(val);
-              setState(() {
-                _datefinController.text = val.toString().split(".")[0];
-                _heurefinController.text = val.toString().split(" ")[1];
-              });
-            },
-          ),
-        ],
-      ),
     );
   }
 

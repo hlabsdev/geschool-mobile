@@ -175,7 +175,6 @@ class _MyMissionsState extends State<AllMissions> {
                   });
               },
               title: Container(
-                // margin: EdgeInsets.symmetric(horizontal: 20.0),
                 height: 40,
                 decoration: BoxDecoration(
                   color: Colors.orange[100],

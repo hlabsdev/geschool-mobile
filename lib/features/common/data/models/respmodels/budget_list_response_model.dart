@@ -131,6 +131,7 @@ class AllDatas {
   String centreName;
   int budgetRecu;
   int budgetPrevision;
+  int budgetSaisie;
   List<DetailBudgetModel> datas;
 
   AllDatas({
@@ -138,6 +139,7 @@ class AllDatas {
     this.centreName,
     this.budgetRecu,
     this.budgetPrevision,
+    this.budgetSaisie,
     this.datas,
   });
 
@@ -146,6 +148,7 @@ class AllDatas {
     this.centreName = json["centre_name"];
     this.budgetRecu = json["budget_recu"];
     this.budgetPrevision = json["budget_prevision"];
+    this.budgetSaisie = json["budget_saisie"];
     this.datas = json["datas"] == null
         ? null
         : (json["datas"] as List)
@@ -159,6 +162,7 @@ class AllDatas {
     data["centre_name"] = this.centreName;
     data["budget_recu"] = this.budgetRecu;
     data["budget_prevision"] = this.budgetPrevision;
+    data["budget_saisie"] = this.budgetSaisie;
     if (this.datas != null)
       data["datas"] = this.datas.map((e) => e.toJson()).toList();
     return data;

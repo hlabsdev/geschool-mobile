@@ -83,6 +83,7 @@ class _DetailBudgetState extends State<DetailBudget> {
             child: Column(
               children: [
                 SizedBox(height: 8),
+                //Nom et prenoms du deposant
                 ListTile(
                   leading: Icon(
                     Icons.person,
@@ -98,7 +99,6 @@ class _DetailBudgetState extends State<DetailBudget> {
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    // textAlign: TextAlign.justify,
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
@@ -112,6 +112,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                     ),
                   ),
                 ),
+                //Description
                 ListTile(
                   leading: Icon(
                     Icons.format_align_justify,
@@ -127,10 +128,32 @@ class _DetailBudgetState extends State<DetailBudget> {
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    // textAlign: TextAlign.justify,
                   ),
                   subtitle: ExpandableText(
                       widget.budget.description ??
+                          allTranslations.text('not_defined'),
+                      "Description"),
+                  isThreeLine: true,
+                ),
+                //Mode de paiement
+                ListTile(
+                  leading: Icon(
+                    Icons.money_rounded,
+                    size: 30,
+                  ),
+                  contentPadding: EdgeInsets.only(right: 10, left: 5),
+                  title: Text(
+                    "Mode de paiement",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: PafpeGreen,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: ExpandableText(
+                      widget.budget.modedon ??
                           allTranslations.text('not_defined'),
                       "Description"),
                   isThreeLine: true,
@@ -175,7 +198,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                         FunctionUtils.convertFormatDate(
                             widget.budget.dateOperation),
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                       ),
                     ),
@@ -189,9 +212,13 @@ class _DetailBudgetState extends State<DetailBudget> {
                     ),
                     DataCell(
                       Text(
-                        widget.budget.montantOperation,
+                        FunctionUtils.formatMontant(
+                            (int.tryParse(widget.budget.montantOperation)),
+                            isMultiline: true),
                         style: TextStyle(
                           fontSize: 12,
+                          color: Colors.blue[300],
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

@@ -141,106 +141,6 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
         child: ListView(
           children: [
             /* Filtre par centre et personnel deb */
-            /* Container(
-              padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: (MediaQuery.of(context).size.width / 2.3),
-                        child: SearchableDropdown(
-                          closeButton: "Fermer",
-                          isExpanded: true,
-                          items: centres
-                              .map((centre) => DropdownMenuItem(
-                                    child: Text(centre.denominationCenter),
-                                    value: centre.denominationCenter,
-                                  ))
-                              .toList(),
-                          hint: _centreController.text == ""
-                              ? Text("Centre")
-                              : Text(FunctionUtils.getCenterName(
-                                  int.parse(_centreController.text), centres)),
-                          onChanged: (value) {
-                            filterPerCentre(
-                                FunctionUtils.getCenterId(value, centres));
-                            setState(() {
-                              _centreController.text =
-                                  FunctionUtils.getCenterId(value, centres)
-                                      .toString();
-                            });
-                            filterInfo(
-                              false,
-                              _centreController.text,
-                              _apprenantController.text,
-                            );
-                          },
-                        ),
-                      ),
-                      Container(
-                        width: (MediaQuery.of(context).size.width / 2.3),
-                        child: SearchableDropdown(
-                          closeButton: "Fermer",
-                          isExpanded: true,
-                          items: apprenantsFilter
-                              .map((apprenant) => DropdownMenuItem(
-                                    child: Text(FunctionUtils.getApprenantName(
-                                        apprenant.keyapprenant, apprenants)),
-                                    value: FunctionUtils.getApprenantName(
-                                        apprenant.keyapprenant, apprenants),
-                                    onTap: () => print(apprenant.keyapprenant),
-                                  ))
-                              .toList(),
-                          hint: _apprenantController.text == ""
-                              ? Text("Apprenant")
-                              : Text(FunctionUtils.getApprenantName(
-                                  _apprenantController.text, apprenants)),
-                          onChanged: (value) {
-                            setState(() {
-                              _apprenantController.text =
-                                  FunctionUtils.getApprenantKey(
-                                      value, apprenants);
-                            });
-                            filterInfo(
-                              false,
-                              _centreController.text,
-                              _apprenantController.text,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  SizedBox(
-                    width: (MediaQuery.of(context).size.width) - 30,
-                    child: Container(
-                      color: Colors.grey[100],
-                      child: CheckboxListTile(
-                        tristate: false,
-                        dense: true,
-                        activeColor: GreenLight,
-                        secondary: const Text('Tout'),
-                        value: allChk,
-                        onChanged: (valueNew) {
-                          setState(() {
-                            allChk = valueNew;
-                            _centreController.clear();
-                            _apprenantController.clear();
-                          });
-                          listAll();
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ), */
-            // SizedBox(height: 5),
-            /* Filtre par centre et personnel end */
             DoubleFilterPaneWidget(
               items1: centres
                   .map((centre) => DropdownMenuItem(
@@ -298,6 +198,8 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
               listAll: () => listAll(),
               isSearchable: true,
             ),
+            /* Filtre par centre et personnel end */
+
             SizedBox(height: 5),
             ListView.separated(
               shrinkWrap: true,
@@ -334,94 +236,6 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  /* children: index == 1
-                      ? [
-                          GroupedListView<PermissionApprenantModel, String>(
-                            shrinkWrap: true,
-                            primary: false,
-                            elements: curentperm[1],
-                            groupBy: (element) {
-                              return element.isdemande;
-                            },
-                            groupSeparatorBuilder: (value) {
-                              return Center(
-                                  child: Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                color: Grey,
-                                // margin: EdgeInsets.all(10),
-                                elevation: 2,
-                                child: Text(
-                                  value == "1" ? "DEMANDES" : "PERMISSIONS",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ));
-                            },
-                            groupComparator: (value1, value2) =>
-                                value2.compareTo(value1),
-                            itemBuilder: (context, element) {
-                              return Slidable(
-                                controller: slidableController,
-                                actionPane: SlidableDrawerActionPane(),
-                                secondaryActions: <Widget>[
-                                  IconSlideAction(
-                                    caption: 'Detail',
-                                    color: Grey,
-                                    icon: Icons.remove_red_eye_rounded,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              DetailPermissionApprenant(
-                                            me: widget.me,
-                                            permission: element,
-                                            centres: centres,
-                                            apprenants: apprenants,
-                                            isApprenant: false,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  element.status == "2"
-                                      ? SizedBox(height: 0, width: 0)
-                                      : IconSlideAction(
-                                          caption: 'Plus',
-                                          color: GreenLight,
-                                          icon: Icons.edit,
-                                          onTap: () {
-                                            _moreAction(context, element);
-                                          },
-                                        ),
-                                ],
-                                child: PermissionApprenantCardWidget(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) {
-                                          return DetailPermissionApprenant(
-                                            me: widget.me,
-                                            permission: element,
-                                            centres: centres,
-                                            apprenants: apprenants,
-                                            isApprenant: false,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  permission: element,
-                                  trailing: _arrowLeft,
-                                ),
-                              );
-                            },
-                          )
-                        ]
-                      : */
                   children: List.generate(
                       curentperm[1].length,
                       (i) => Slidable(
@@ -490,7 +304,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
-                return SizedBox(height: 8);
+                return SizedBox(height: 5);
               },
             ),
           ],
@@ -501,7 +315,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
 
   bool checkActionable(PermissionApprenantModel perm) {
     bool result = true;
-    if (perm.isdemande == "0" || perm.status == "2") {
+    if (perm.isdemande == "1" || perm.status == "2") {
       result = false;
     }
     return result;
@@ -650,7 +464,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
   }
 
   /// envoie des donnees de validation au serveur
-  validate(bool accorded) async {
+  validate0(bool accorded) async {
     setState(() {
       validateDto.operation = accorded ? "1" : "2";
     });
@@ -704,6 +518,20 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
     });
   }
 
+  validate(bool accorded) {
+    Api api = ApiRepository();
+    FunctionUtils.sendData(
+        context: context,
+        dto: addPermDto,
+        repositoryFunction: api.validatePerm,
+        // clearController: clearController,
+        onSuccess: (a) {
+          // rafraichisssement de la page en recuperant de nouveau les donnees
+          getInfos();
+        },
+        onFailure: () {});
+  }
+
   sendPerm() {
     Api api = ApiRepository();
     FunctionUtils.sendData(
@@ -711,86 +539,12 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
         dto: addPermDto,
         repositoryFunction: api.sendPerm,
         clearController: clearController,
+        isAForm: true,
         onSuccess: (a) {
-          ///On ferme le formulaire
-          Navigator.of(context).pop(null);
-
           getInfos();
-          // setState(() {
-          //   information = a.information;
-          //   if (permissionFilter.length > 0) permissionFilter.clear();
-          //   permissionFilter.addAll(information);
-          //   allChk = true;
-          //   permissionFilter.sort((a, b) =>
-          //       DateTime.tryParse(b.datedemandepermission)
-          //           .compareTo(DateTime.tryParse(a.datedemandepermission)));
-          // });
         },
         onFailure: () {});
   }
-
-  /* sendPerm() {
-    print("user changing...");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(allTranslations.text('processing')),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator()
-              ],
-            ),
-          );
-        });
-    Api api = ApiRepository();
-    api.sendPerm(addPermDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de l'utilisateur dans la session
-            Navigator.of(context).pop(null);
-            Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 1);
-            clearController();
-            setState(() {
-              information = a.information;
-              /* Listes */
-              matiereController.text = "";
-              classeController.text = "";
-              periodeController.text = "";
-              if (permissionFilter.length > 0) permissionFilter.clear();
-              permissionFilter.addAll(information);
-              allChk = true;
-
-              permissionFilter.sort((a, b) =>
-                  a.datedemandepermission.compareTo(b.datedemandepermission));
-            });
-            return true;
-          } else {
-            //l'api a retourne une Erreur
-            Navigator.of(context).pop(null);
-            // Navigator.of(context).pop(null);
-            FunctionUtils.displaySnackBar(context, a.message, type: 0);
-            return false;
-          }
-        });
-      } else {
-        Navigator.of(context).pop(null);
-        // Navigator.of(context).pop(null);
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    });
-  } */
 
   void listAll() {
     filterInfo(true);

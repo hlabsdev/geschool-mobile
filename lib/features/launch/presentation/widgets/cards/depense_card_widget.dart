@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
+import 'package:geschool/features/launch/presentation/pages/depense/all_depenses.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class DepenseCardWidget extends StatelessWidget {
@@ -19,18 +20,15 @@ class DepenseCardWidget extends StatelessWidget {
       // color: renderDepenseColor(int.tryParse(depense.status)),
       color: renderDepenseColor(depense),
       child: ListTile(
-        // tileColor: Colors.grey[300],
         leading:
             Icon(Icons.personal_injury, size: 50.0, color: Colors.grey[700]),
-        // title: Text(elmt.typeEvaluation),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Nom deponsant
             ConstrainedBox(
               constraints: BoxConstraints(
-                  maxWidth: (MediaQuery.of(context).size.width / 2.5)),
+                  maxWidth: (MediaQuery.of(context).size.width / 3)),
               child: Text(
                 depense.nom + " " + depense.prenoms,
                 style: TextStyle(color: PafpeGreen, fontSize: 18),
@@ -53,27 +51,47 @@ class DepenseCardWidget extends StatelessWidget {
             ),
           ],
         ),
-        subtitle: Column(
+        subtitle: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 8),
-            // Motif
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxWidth: (MediaQuery.of(context).size.width / 2)),
-              child: Text(
-                depense.motifdemande,
-                style: TextStyle(color: GreenLight),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
             // Montant
-            Text('Montant : ${depense.montantdepense}',
-                style: TextStyle(
-                    // color: Colors.blueAccent,
-                    // fontWeight: FontWeight.bold,
+            Row(
+              children: [
+                Text('Montant: ',
+                    style: TextStyle(
+                        // color: Colors.blueAccent,
+                        // fontWeight: FontWeight.bold,
+                        )),
+                Text(
+                    '${FunctionUtils.formatMontant(int.tryParse(depense.montantdepense))}',
+                    style: TextStyle(
+                      // color: Colors.blue[200],
+                      fontWeight: FontWeight.bold,
                     )),
+              ],
+            ),
+            isTreated(depense)
+                ? Container(
+                    height: 18,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: depense.status == "2"
+                          ? Colors.red[300]
+                          : Colors.green[300],
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      (depense.status == "2" ? "Refusée" : "Décaissée")
+                          .toUpperCase(),
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  )
+                : SizedBox(height: 0, width: 0),
           ],
         ),
         trailing: trailing,
@@ -82,22 +100,21 @@ class DepenseCardWidget extends StatelessWidget {
     );
   }
 
-  // renderDepenseColor(int etat) {
+  /// Cette fonction prend une ```DepenseModel``` en parametre et
+  /// renvoie ```true``` si  ```status==2``` ou s'il a ete decaisse, et ```false``` dans le cas contraire
+  static bool isTreated(DepenseModel depense) {
+    return (depense.status == "2" ||
+        (!(depense.datedepense.isEmptyOrNull) && (depense.status == "1")));
+  }
+
   renderDepenseColor(DepenseModel depense) {
     Color result;
     int etat = int.tryParse(depense.status);
-    if ((depense.datedepense.isEmptyOrNull) && (depense.status == "1")) {
-      result = Colors.white;
-    } else {
-      result = etat == 0
-          ? Colors.grey[400]
-          : etat == 1
-              ? Colors.green[200]
-              : etat == 2
-                  ? Colors.red[200]
-                  : Colors.grey[200];
-    }
-
+    result = isTreated(depense)
+        ? Colors.grey[300]
+        : etat == 0
+            ? Colors.white
+            : Colors.green[200];
     return result;
   }
 

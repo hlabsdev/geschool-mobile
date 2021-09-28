@@ -756,17 +756,17 @@ class FunctionUtils {
     // Clearing the orinal list
     allList.clear();
 
-// Sorted list ready to be used
+    // Sorted list ready to be used
     allList.addAll(pendings);
     allList.addAll(rapporteds);
     // return allList;
   }
 
-  ///@Hlabs: Send data to server via a form (Ajout, modification a travers un formulaire)
+  /// @Hlabs: Send data to server via a form (Ajout, modification a travers un formulaire)
   static sendData({
     BuildContext context,
 
-    ///le nom du dto ici exemple: getInfoDto
+    /// le nom du dto ici exemple: getInfoDto
     dynamic dto,
 
     /// Fonction du api_repository qui servira a envoyer les donnees au serveur. Ecrire le nom precede de "api" exemple: api.sendTache
@@ -776,6 +776,7 @@ class FunctionUtils {
     Function clearController,
 
     /// Fonction a executer quand l'envoie de donnee s'est bien passee
+    /// Noter que l'animation du loading est deja fermee donc seulement s'il ya un autre formulaire ouvert on le ferme ici
     Function onSuccess,
 
     /// Fonction a executer quand l'envoie de donnee n'a pas abouti ou a generer une erreur
@@ -783,6 +784,9 @@ class FunctionUtils {
 
     /// Message de chargement
     String loadingMessage,
+
+    /// S'il s'agit d'un formulaire ou pas, si oui on ferme le formulaire, dans le cas contraire on ne fait rien.
+    bool isAForm,
   }) {
     print("sending data ...");
     showDialog(
@@ -815,6 +819,11 @@ class FunctionUtils {
 
             ///On netoie les champs du formulaire
             clearController();
+
+            ///On ferme le formulaire s'il y en a
+            (isAForm == false || isAForm == null)
+                ? debugPrint("Not a form")
+                : Navigator.of(context).pop(null);
 
             ///On affiche pendant 5 secondes le message de succes
             displaySnackBar(context, a.message, type: 1);
@@ -857,28 +866,28 @@ class FunctionUtils {
     ///le nom du dto ici exemple: getInfoDto
     dynamic dto,
 
-    /// Fonction loading avec comme parametre [true], ou tout autre fonction a executer avant la recuperation des données
+    ///Fonction loading avec comme parametre [true], ou tout autre fonction a executer avant la recuperation des données
     Function startFunction,
 
-    /// Fonction loading avec comme parametre [false], ou tout autre fonction a executer a la fin de la recuperation des données
+    ///Fonction loading avec comme parametre [false], ou tout autre fonction a executer a la fin de la recuperation des données
     Function stopFunction,
 
-    /// Fonction du api_repository qui servira a recuperer les donnees du serveur. Ecrire le nom precede de "api" exemple: api.getPermisssions
+    ///Fonction du api_repository qui servira a recuperer les donnees du serveur. Ecrire le nom precede de "api" exemple: api.getPermisssions
     Function repositoryFunction,
 
-    /// Fonction a executer quand la reception de donnee s'est bien passee
+    ///Fonction a executer quand la reception de donnee s'est bien passee
     Function onSuccess,
 
-    /// Fonction a executer en cas d'erreur lors de la reception de donnees
+    ///Fonction a executer en cas d'erreur lors de la reception de donnees
     Function onEmpty,
 
-    /// Fonction a executer en cas d'erreur au niveau du serveur
+    ///Fonction a executer en cas d'erreur au niveau du serveur
     Function(bool value) onFailure,
 
-    /// Fonction a executer en cas d'erreur dans la reponse du serveur
+    ///Fonction a executer en cas d'erreur dans la reponse du serveur
     Function onServerError,
 
-    /// Erreur d'execution ou pas
+    ///Erreur d'execution ou pas
     bool error,
   }) {
     print("En recuperation...");
@@ -888,7 +897,7 @@ class FunctionUtils {
         value.all((a) {
           if (a != null && a.status.compareTo("000") == 0) {
             /* ===== quand l'api retourne un code "000" ===== */
-            /// Les setState necessaires
+            ///Les setState necessaires
             onSuccess(a);
             stopFunction();
             return true;
@@ -914,6 +923,39 @@ class FunctionUtils {
       onServerError();
       return false;
     });
+  }
+
+  ///@Hlabs: Formatter les chiffres en millier separee par des point
+  /// ```exemple```:
+  /// ```dart
+  /// formatMontant(1507800900,58006) => "1.507.800.900 FCFA"
+  /// formatMontant(1507800900,58006, devise:"FCFA", nbreDecimale:3) => "1.507.800.900,580 FCFA"
+  /// formatMontant(1507800900,58006, devise:"FCFA", isMultiline = true) => "1.507.800.900\nFCFA" ==>"1.507.800.900
+  ///                                                                                                 FCFA"
+  /// ```
+  static String formatMontant(
+    ///montant a formater en millier
+    int montant, {
+
+    /// Devise de la somme exemple ["CFA"]
+    String devise,
+
+    ///Nombre de chifre apres la virgule, default=0
+    int nbreDecimale,
+
+    ///Mettre la devise sur la meme ligne ou pas. default = false
+    bool isMultiline = false,
+  }) {
+    String result = "";
+    result = isMultiline
+        ? (NumberFormat.decimalPattern('eu').format(montant) +
+            "\n${devise ?? "FCFA"}")
+        : (NumberFormat.simpleCurrency(
+                name: devise ?? 'FCFA',
+                locale: 'eu',
+                decimalDigits: nbreDecimale ?? 0)
+            .format(montant));
+    return result;
   }
 /* End of class */
 }

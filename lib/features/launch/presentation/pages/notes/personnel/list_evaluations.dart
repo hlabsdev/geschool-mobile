@@ -200,6 +200,8 @@ class _ListEvaluationsState extends State<ListEvaluations> {
               // GroupedListView<EvaluationModel, String>(
               itemCount: evaluationFilter.length,
               itemBuilder: (context, i) {
+                Centres centre =
+                    new Centres(key: evaluationFilter[i].idcenter, value: "");
                 return Slidable(
                   controller: slidableController,
                   actionPane: SlidableDrawerActionPane(),
@@ -209,8 +211,6 @@ class _ListEvaluationsState extends State<ListEvaluations> {
                       color: GreenLight,
                       icon: Icons.edit,
                       onTap: () {
-                        /* this._moreActionEleve(
-                          context, classes[i], specialites[i].nom); */
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -219,11 +219,14 @@ class _ListEvaluationsState extends State<ListEvaluations> {
                               // evaluation: elmt,
                               evaluation: evaluationFilter[i],
                               annee: annee,
-                              centre: centres
-                                  .firstWhere((element) => element.key != 1),
+                              centre: Centres(
+                                  key: evaluationFilter[i].idcenter, value: ""),
                             ),
                           ),
                         );
+                        print(Centres(
+                                key: evaluationFilter[i].idcenter, value: "")
+                            .toJson());
                       },
                     ),
                     IconSlideAction(
@@ -239,11 +242,14 @@ class _ListEvaluationsState extends State<ListEvaluations> {
                               // evaluation: elmt,
                               evaluation: evaluationFilter[i],
                               annee: annee,
-                              centre: centres
-                                  .firstWhere((element) => element.key != 1),
+                              centre: Centres(
+                                  key: evaluationFilter[i].idcenter, value: ""),
                             ),
                           ),
                         );
+                        print(Centres(
+                                key: evaluationFilter[i].idcenter, value: "")
+                            .toJson());
                       },
                     ),
                   ],
@@ -278,11 +284,15 @@ class _ListEvaluationsState extends State<ListEvaluations> {
                                 // evaluation: elmt,
                                 evaluation: evaluationFilter[i],
                                 annee: annee,
-                                centre: centres
-                                    .firstWhere((element) => element.key != 1),
+                                centre: Centres(
+                                    key: evaluationFilter[i].idcenter,
+                                    value: ""),
                               ),
                             ),
                           );
+                          print(Centres(
+                                  key: evaluationFilter[i].idcenter, value: "")
+                              .toJson());
                         }),
                   ),
                 );

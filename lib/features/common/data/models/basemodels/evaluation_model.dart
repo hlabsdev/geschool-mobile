@@ -5,6 +5,7 @@ class EvaluationModel {
   String typeEvaluation;
   String matiere;
   String classe;
+  int idcenter;
 
   EvaluationModel({
     this.keyEvaluation,
@@ -13,6 +14,7 @@ class EvaluationModel {
     this.typeEvaluation,
     this.matiere,
     this.classe,
+    this.idcenter,
   });
 
   EvaluationModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class EvaluationModel {
     this.typeEvaluation = json["type_evaluation"];
     this.matiere = json["matiere"];
     this.classe = json["classe"];
+    this.idcenter = json["idcenter"];
   }
 
   Map<String, dynamic> toJson() {
@@ -32,6 +35,7 @@ class EvaluationModel {
     data["type_evaluation"] = this.typeEvaluation;
     data["matiere"] = this.matiere;
     data["classe"] = this.classe;
+    data["idcenter"] = this.idcenter;
     return data;
   }
 }

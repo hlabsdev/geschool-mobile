@@ -313,8 +313,7 @@ class _NoteClasseState extends State<NoteClasse> {
                   ),
                 ),
               );
-              // Navigator.pop(context);
-              // Navigator.of(context).;
+              print(widget.centre.toJson());
             });
             return true;
           } else {

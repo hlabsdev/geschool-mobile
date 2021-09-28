@@ -138,6 +138,7 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
             //enregistrement des informations de recuperes
             setState(() {
               eleves.clear();
+              centres.clear();
               information = a.information;
               if (information.length > 0)
                 information.sort((a, b) =>
@@ -493,7 +494,7 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
     for (var item in eleves) {
       tabs.add(ElevePermissionWidget(
         information: information
-            .where((element) => element.keyapprenant == item.keyapprenant)
+            .where((perm) => perm.keyapprenant == item.keyapprenant)
             .toList(),
         me: widget.me,
       ));
