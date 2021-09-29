@@ -117,9 +117,6 @@ class _MyPermisionsApprenantState extends State<MyPermisionsApprenant> {
               debugPrint(addPermDto.keyApprenant);
               debugPrint(widget.me.toJson().toString());
               addPermDto.uIdentifiant = widget.me.authKey;
-              var date = ((DateTime.now()).toString());
-              addPermDto.dateDemande = date.split(" ")[0];
-              debugPrint("$date");
               debugPrint(addPermDto.dateDemande);
               addPermDto.demande = "1";
 
@@ -207,8 +204,11 @@ class _MyPermisionsApprenantState extends State<MyPermisionsApprenant> {
   void showAddForm(PermissionApprenantModel permission) {
     if (permission != null) {
       _motifController.text = permission.motifpermission;
-      _datedebutController.text = permission.datedebutpermission;
-      _datefinController.text = permission.datefinpermission;
+      _datedebutController.text = permission.datedebutpermission +
+          " " +
+          permission.heuredebutpermission;
+      _datefinController.text =
+          permission.datefinpermission + " " + permission.heurefinpermission;
       _heuredebutController.text = permission.heuredebutpermission;
       _heurefinController.text = permission.heurefinpermission;
       addPermDto.permissionKey = permission.keypermission;
@@ -240,6 +240,8 @@ class _MyPermisionsApprenantState extends State<MyPermisionsApprenant> {
                         print('Tâche ajoutée');
                         setState(() {
                           addPermDto.demande = "1";
+                          var date = ((DateTime.now()).toString());
+                          addPermDto.dateDemande = date.split(".")[0];
                           addPermDto.motif = _motifController.text ?? "";
                           addPermDto.dateDebut =
                               _datedebutController.text.split(" ")[0] ?? "";

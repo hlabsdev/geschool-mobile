@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
-import 'package:geschool/features/launch/presentation/pages/depense/all_depenses.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class DepenseCardWidget extends StatelessWidget {

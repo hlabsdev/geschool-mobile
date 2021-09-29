@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geschool/allTranslations.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
 import 'package:geschool/features/common/data/models/respmodels/conduite_list_reponse_model.dart';
 import 'package:geschool/features/launch/presentation/pages/conduites/detail_conduite.dart';

@@ -316,8 +316,12 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
     // Pour un apprenant (Ou parent) il ne peut modifer
     //que si la permission n'est pas encore traitee
     if (isApprenant == true || isApprenant == null) {
-      if (permission.status == "2" || permission.status == "1") {
-        fab = SizedBox(height: 0, width: 0);
+      if (permission.status == "2" ||
+          permission.status == "1" ||
+          (permission.status == "1" &&
+              DateTime.tryParse(permission.datedebutpermission)
+                  .isBefore(DateTime.now()))) {
+        fab = null;
       } else if (permission.status == "0") {
         fab = FloatingActionButton(
           onPressed: () {
@@ -329,7 +333,10 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
       //On est icic dans le cadre d'un personnel
     } else if (isApprenant == false) {
       // Refusee
-      if (permission.status == "2") {
+      if (permission.status == "2" ||
+          (permission.status == "1" &&
+              DateTime.tryParse(permission.datedebutpermission)
+                  .isBefore(DateTime.now()))) {
         fab = null;
 
         //  satus 0: En attente
@@ -495,6 +502,9 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
             //enregistrement des informations de l'utilisateur dans la session
             Navigator.of(context).pop(null);
             FunctionUtils.displaySnackBar(context, a.message, type: 1);
+            setState(() {
+              widget.permission.status = accorded ? "1" : "2";
+            });
             return true;
           } else {
             //l'api a retourne une Erreur
@@ -545,13 +555,17 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
   }
 
 /* Forms */
-
+  /// For Apprenant1
   void showAddForm() {
     _centreController.text = widget.permission.idCenter.toString();
     _apprenantController.text = widget.permission.keyapprenant;
     _motifController.text = widget.permission.motifpermission;
-    _datedebutController.text = widget.permission.datedebutpermission;
-    _datefinController.text = widget.permission.datefinpermission;
+    _datedebutController.text = widget.permission.datedebutpermission +
+        " " +
+        widget.permission.heuredebutpermission;
+    _datefinController.text = widget.permission.datefinpermission +
+        " " +
+        widget.permission.heurefinpermission;
     _heuredebutController.text = widget.permission.heuredebutpermission;
     _heurefinController.text = widget.permission.heurefinpermission;
     _datedemandeController.text = widget.permission.datedemandepermission;
@@ -578,13 +592,13 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
                 TextButton(
                   onPressed: () {
                     if (formKey.currentState.validate()) {
-                      print('Tâche ajoutée');
+                      print('perm ajoutée');
                       setState(() {
                         addPermDto.idCenter = _centreController.text;
                         addPermDto.keyApprenant = _apprenantController.text;
                         addPermDto.motif = _motifController.text ?? "";
                         addPermDto.dateDemande =
-                            _datedemandeController.text.split(" ")[0] ?? "";
+                            _datedemandeController.text ?? "";
                         addPermDto.dateDebut =
                             _datedebutController.text.split(" ")[0] ?? "";
                         addPermDto.dateFin =
@@ -607,12 +621,17 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
     );
   }
 
+  /// For personnel
   showForm() {
     _centreController.text = widget.permission.idCenter.toString();
     _apprenantController.text = widget.permission.keyapprenant;
     _motifController.text = widget.permission.motifpermission;
-    _datedebutController.text = widget.permission.datedebutpermission;
-    _datefinController.text = widget.permission.datefinpermission;
+    _datedebutController.text = widget.permission.datedebutpermission +
+        " " +
+        widget.permission.heuredebutpermission;
+    _datefinController.text = widget.permission.datefinpermission +
+        " " +
+        widget.permission.heurefinpermission;
     _heuredebutController.text = widget.permission.heuredebutpermission;
     _heurefinController.text = widget.permission.heurefinpermission;
     _datedemandeController.text = widget.permission.datedemandepermission;
@@ -647,7 +666,7 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
                         addPermDto.keyApprenant = _apprenantController.text;
                         addPermDto.motif = _motifController.text ?? "";
                         addPermDto.dateDemande =
-                            _datedemandeController.text.split(" ")[0] ?? "";
+                            _datedemandeController.text ?? "";
                         addPermDto.dateDebut =
                             _datedebutController.text.split(" ")[0] ?? "";
                         addPermDto.dateFin =
@@ -694,8 +713,7 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
                               int.parse(_centreController.text),
                               widget.centres)),
                       onChanged: (value) {
-                        filterPerCentre(
-                            FunctionUtils.getCenterId(value, widget.centres));
+                        // filterPerCentre(FunctionUtils.getCenterId(value, widget.centres));
                         setState(() {
                           _centreController.text =
                               FunctionUtils.getCenterId(value, widget.centres)

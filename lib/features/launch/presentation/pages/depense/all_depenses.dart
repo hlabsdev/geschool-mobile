@@ -450,11 +450,9 @@ class _AllDepensesState extends State<AllDepenses> {
         context: context,
         dto: validateDto,
         repositoryFunction: api.validateDepense,
+        isAForm: !accorded,
         clearController: clearController,
         onSuccess: (a) {
-          if (!accorded) {
-            Navigator.of(context).pop(null);
-          }
           getInfos();
         },
         onFailure: () {});

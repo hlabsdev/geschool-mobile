@@ -257,8 +257,11 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
   void showAddForm(PermissionApprenantModel permission) {
     if (permission != null) {
       _motifController.text = permission.motifpermission;
-      _datedebutController.text = permission.datedebutpermission;
-      _datefinController.text = permission.datefinpermission;
+      _datedebutController.text = permission.datedebutpermission +
+          " " +
+          permission.heuredebutpermission;
+      _datefinController.text =
+          permission.datefinpermission + " " + permission.heurefinpermission;
       _heuredebutController.text = permission.heuredebutpermission;
       _heurefinController.text = permission.heurefinpermission;
       addPermDto.permissionKey = permission.keypermission;
@@ -295,7 +298,7 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
                           addPermDto.demande = "1";
                           addPermDto.motif = _motifController.text ?? "";
                           addPermDto.dateDemande =
-                              DateTime.now().toString().split(" ")[0];
+                              DateTime.now().toString().split(".")[0];
                           addPermDto.uIdentifiant = widget.me.authKey;
                           addPermDto.idCenter = _centreController.text ?? "";
                           addPermDto.keyApprenant =

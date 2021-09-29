@@ -47,7 +47,6 @@ import 'package:geschool/features/launch/presentation/pages/splash/splash_screen
 import 'package:geschool/features/launch/presentation/pages/taches/all_taches.dart';
 import 'package:geschool/features/launch/presentation/pages/taches/detail_tache.dart';
 import 'package:geschool/features/launch/presentation/pages/taches/mes_taches.dart';
-import 'package:geschool/helpers/database_helper.dart';
 import 'package:provider/provider.dart';
 import 'features/common/data/function_utils.dart';
 

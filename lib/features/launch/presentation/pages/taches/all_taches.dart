@@ -693,8 +693,7 @@ class _AllTasksState extends State<AllTasks> {
                               : Text(FunctionUtils.getCenterName(
                                   int.parse(_centreController.text), centres)),
                           onChanged: (value) {
-                            filterPerCentre(
-                                FunctionUtils.getCenterId(value, centres));
+                            // filterPerCentre(FunctionUtils.getCenterId(value, centres));
                             setState(() {
                               _centreController.text =
                                   FunctionUtils.getCenterId(value, centres)

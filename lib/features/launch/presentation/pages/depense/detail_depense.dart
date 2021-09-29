@@ -493,6 +493,7 @@ class _DetailDepenseState extends State<DetailDepense>
         context: context,
         dto: validateDto,
         repositoryFunction: api.validateDepense,
+        isAForm: !accorded,
         onSuccess: (a) {
           // getInfos();
           setState(() {

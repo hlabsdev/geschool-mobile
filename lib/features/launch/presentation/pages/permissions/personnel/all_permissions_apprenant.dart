@@ -1,6 +1,5 @@
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geschool/allTranslations.dart';
 import 'package:geschool/core/utils/colors.dart';
@@ -265,15 +264,29 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                                     ),
                                     curentperm[1][i].status == "2"
                                         ? SizedBox(height: 0, width: 0)
-                                        : IconSlideAction(
-                                            caption: 'Plus',
-                                            color: GreenLight,
-                                            icon: Icons.edit,
-                                            onTap: () {
-                                              _moreAction(
-                                                  context, curentperm[1][i]);
-                                            },
-                                          ),
+                                        : ((curentperm[1][i].status == "1") &&
+                                                (DateTime.tryParse(curentperm[1]
+                                                            [i]
+                                                        .datedebutpermission)
+                                                    .isAfter(DateTime.now())))
+                                            ? IconSlideAction(
+                                                caption: 'Modifier',
+                                                color: GreenLight,
+                                                icon: Icons.edit,
+                                                onTap: () {
+                                                  showForm(context,
+                                                      curentperm[1][i]);
+                                                },
+                                              )
+                                            : IconSlideAction(
+                                                caption: 'Plus',
+                                                color: GreenLight,
+                                                icon: Icons.edit,
+                                                onTap: () {
+                                                  _moreAction(context,
+                                                      curentperm[1][i]);
+                                                },
+                                              ),
                                   ]
                                 : null,
                             child: PermissionApprenantCardWidget(
@@ -315,7 +328,10 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
 
   bool checkActionable(PermissionApprenantModel perm) {
     bool result = true;
-    if (perm.isdemande == "1" || perm.status == "2") {
+    if (((perm.status == "1") &&
+            (DateTime.tryParse(perm.datedebutpermission)
+                .isBefore(DateTime.now()))) ||
+        perm.status == "2") {
       result = false;
     }
     return result;
@@ -464,65 +480,12 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
   }
 
   /// envoie des donnees de validation au serveur
-  validate0(bool accorded) async {
-    setState(() {
-      validateDto.operation = accorded ? "1" : "2";
-    });
-    print("user changing...");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            contentPadding: EdgeInsets.all(12),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(allTranslations.text('processing')),
-                SizedBox(
-                  height: 20,
-                ),
-                CircularProgressIndicator(
-                    // valueColor: AlwaysStoppedAnimation(FunctionUtils.colorFromHex("")), //a changer
-                    )
-              ],
-            ),
-          );
-        });
-
-    Api api = ApiRepository();
-    api.validatePerm(validateDto).then((value) {
-      if (value.isRight()) {
-        value.all((a) {
-          if (a != null && a.status.compareTo("000") == 0) {
-            //enregistrement des informations de l'utilisateur dans la session
-            Navigator.of(context).pop(null);
-            setState(() {});
-            FunctionUtils.displaySnackBar(context, a.message, type: 1);
-            return true;
-          } else {
-            //l'api a retourne une Erreur
-            Navigator.of(context).pop(null);
-
-            FunctionUtils.displaySnackBar(context, a.message, type: 0);
-            return false;
-          }
-        });
-      } else {
-        Navigator.of(context).pop(null);
-        FunctionUtils.displaySnackBar(
-            context, allTranslations.text('error_process'));
-        return false;
-      }
-    });
-  }
-
   validate(bool accorded) {
+    print(validateDto.toJson());
     Api api = ApiRepository();
     FunctionUtils.sendData(
         context: context,
-        dto: addPermDto,
+        dto: validateDto,
         repositoryFunction: api.validatePerm,
         // clearController: clearController,
         onSuccess: (a) {
@@ -610,8 +573,11 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
       _centreController.text = permission.idCenter.toString();
       _apprenantController.text = permission.keyapprenant;
       _motifController.text = permission.motifpermission;
-      _datedebutController.text = permission.datedebutpermission;
-      _datefinController.text = permission.datefinpermission;
+      _datedebutController.text = permission.datedebutpermission +
+          " " +
+          permission.heuredebutpermission;
+      _datefinController.text =
+          permission.datefinpermission + " " + permission.heurefinpermission;
       _heuredebutController.text = permission.heuredebutpermission;
       _heurefinController.text = permission.heurefinpermission;
       _datedemandeController.text = permission.datedemandepermission;
@@ -652,7 +618,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                         addPermDto.keyApprenant = _apprenantController.text;
                         addPermDto.motif = _motifController.text ?? "";
                         addPermDto.dateDemande =
-                            _datedemandeController.text.split(" ")[0] ?? "";
+                            _datedemandeController.text ?? "";
                         addPermDto.dateDebut =
                             _datedebutController.text.split(" ")[0] ?? "";
                         addPermDto.dateFin =
@@ -699,7 +665,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                       : Text(FunctionUtils.getCenterName(
                           int.parse(_centreController.text), centres)),
                   onChanged: (value) {
-                    filterPerCentre(FunctionUtils.getCenterId(value, centres));
+                    // filterPerCentre(FunctionUtils.getCenterId(value, centres));
                     setState(() {
                       _centreController.text =
                           FunctionUtils.getCenterId(value, centres).toString();
@@ -920,7 +886,7 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
         List<Widget> listAction = <Widget>[];
 
         //si la pemission est deja refusee on ne peut plus la modifier
-        if (permission.status == "2" || permission.isdemande == "0") {
+        if (permission.status == "2") {
           listAction.add(ListTile(
             leading: Icon(
               Icons.cancel,
@@ -931,17 +897,6 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
         }
         //si la pemission est deja validee on ne peut plus la modifier
         else if (permission.status == "1" && permission.isdemande == "1") {
-          /* listAction.add(ListTile(
-            leading: Icon(
-              Icons.cancel_rounded,
-              color: Colors.red[300],
-            ),
-            title: Text('Refuser'),
-            onTap: () {
-              Navigator.of(context).pop(null);
-              _confirmPermValidation(context, permission, false);
-            },
-          )); */
           listAction.add(ListTile(
             leading: Icon(
               Icons.edit_rounded,

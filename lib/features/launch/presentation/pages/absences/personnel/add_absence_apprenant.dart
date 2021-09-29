@@ -257,10 +257,12 @@ class _AddApprenantAbsenceState extends State<AddApprenantAbsence> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Container(
-                                      width:
-                                          (MediaQuery.of(context).size.width /
-                                              5),
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4),
                                       child: DropdownButtonFormField<String>(
                                         isExpanded: true,
                                         items: typeAbs

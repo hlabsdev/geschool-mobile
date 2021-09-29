@@ -45,17 +45,14 @@ class PermissionApprenantCardWidget extends StatelessWidget {
               ),
               SizedBox(width: 10),
               // Date
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: (MediaQuery.of(context).size.width / 2.5)),
-                  child: Text(
-                    FunctionUtils.convertFormatDate(
-                        permission.datedemandepermission),
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxWidth: (MediaQuery.of(context).size.width / 2.5)),
+                child: Text(
+                  FunctionUtils.convertFormatDate(
+                      permission.datedemandepermission),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -104,8 +101,8 @@ class PermissionApprenantCardWidget extends StatelessWidget {
           ? Colors.grey[200]
           : etat == 1
               ? isdemande == 0
-                  ? Colors.green[200]
-                  : Colors.green[300]
+                  ? Colors.green[300]
+                  : Colors.green[200]
               : etat == 2
                   ? Colors.red[200]
                   : Colors.grey[200];

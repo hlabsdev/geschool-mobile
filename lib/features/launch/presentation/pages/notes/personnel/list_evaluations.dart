@@ -200,8 +200,6 @@ class _ListEvaluationsState extends State<ListEvaluations> {
               // GroupedListView<EvaluationModel, String>(
               itemCount: evaluationFilter.length,
               itemBuilder: (context, i) {
-                Centres centre =
-                    new Centres(key: evaluationFilter[i].idcenter, value: "");
                 return Slidable(
                   controller: slidableController,
                   actionPane: SlidableDrawerActionPane(),
