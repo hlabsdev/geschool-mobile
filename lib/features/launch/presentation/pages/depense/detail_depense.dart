@@ -1,4 +1,5 @@
-import 'package:date_time_picker/date_time_picker.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:geschool/allTranslations.dart';
@@ -6,20 +7,16 @@ import 'package:geschool/core/utils/colors.dart';
 import 'package:geschool/features/common/data/datasources/remote/api.dart';
 import 'package:geschool/features/common/data/dto/add_permission_dto.dart';
 import 'package:geschool/features/common/data/dto/validate_depense_dto.dart';
-import 'package:geschool/features/common/data/dto/validate_perm_dto.dart';
 import 'package:geschool/features/common/data/function_utils.dart';
-import 'package:geschool/features/common/data/models/basemodels/apprenant_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/centre_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/depense_model.dart';
 import 'package:geschool/features/common/data/models/basemodels/user_model.dart';
 import 'package:geschool/features/common/data/models/respmodels/depense_list_response_model.dart';
 import 'package:geschool/features/common/data/repositories/api_repository.dart';
 import 'package:geschool/features/launch/presentation/widgets/cards/depense_card_widget.dart';
-import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_fab.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/expandable_text.dart';
 import 'package:geschool/features/launch/presentation/widgets/decorations/fab_element.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'dart:math' as math;
 
 // ignore: must_be_immutable
 class DetailDepense extends StatefulWidget {
@@ -56,6 +53,7 @@ class _DetailDepenseState extends State<DetailDepense>
       vsync: this,
     );
     super.initState();
+    print("Refus: ${widget.depense.motifsuppression}");
   }
 
   @override
@@ -395,14 +393,14 @@ class _DetailDepenseState extends State<DetailDepense>
         tooltip: "Accorder",
         icon: Icons.check_circle_rounded,
         backgroundColor: Colors.green,
-        forgroundColor: Colors.white,
+        iconColor: Colors.white,
         onPressed: () => _confirmValidation(context, depense, true, false),
       ),
       FabElement(
         tooltip: "Refuser",
         icon: Icons.cancel_rounded,
         backgroundColor: Colors.redAccent,
-        forgroundColor: Colors.white,
+        iconColor: Colors.white,
         onPressed: () => _confirmValidation(context, depense, false, false),
       ),
     ];
@@ -420,61 +418,7 @@ class _DetailDepenseState extends State<DetailDepense>
                 ),
                 backgroundColor: Colors.green,
               )
-            : new Column(
-                mainAxisSize: MainAxisSize.min,
-                children: new List.generate(icons.length, (int index) {
-                  Widget child = new Container(
-                    height: 70.0,
-                    width: 56.0,
-                    alignment: FractionalOffset.topCenter,
-                    child: new ScaleTransition(
-                      scale: new CurvedAnimation(
-                        parent: controller,
-                        curve: new Interval(
-                            0.0, 1.0 - index / icons.length / 2.0,
-                            curve: Curves.easeOut),
-                      ),
-                      child: new FloatingActionButton(
-                        heroTag: null,
-                        backgroundColor: icons[index].backgroundColor,
-                        mini: true,
-                        tooltip: icons[index].tooltip,
-                        child: new Icon(icons[index].icon,
-                            color: icons[index].forgroundColor),
-                        onPressed: () {
-                          icons[index].onPressed();
-                        },
-                      ),
-                    ),
-                  );
-                  return child;
-                }).toList()
-                  ..add(
-                    new FloatingActionButton(
-                      heroTag: null,
-                      child: new AnimatedBuilder(
-                        animation: controller,
-                        builder: (BuildContext context, Widget child) {
-                          return new Transform(
-                            transform: new Matrix4.rotationZ(
-                                controller.value * 0.5 * math.pi),
-                            alignment: FractionalOffset.center,
-                            child: new Icon(controller.isDismissed
-                                ? Icons.menu
-                                : Icons.close),
-                          );
-                        },
-                      ),
-                      onPressed: () {
-                        if (controller.isDismissed) {
-                          controller.forward();
-                        } else {
-                          controller.reverse();
-                        }
-                      },
-                    ),
-                  ),
-              );
+            : MultiFabWidget(childrens: icons, controller: controller);
 
     return fab;
   }
@@ -494,6 +438,7 @@ class _DetailDepenseState extends State<DetailDepense>
         dto: validateDto,
         repositoryFunction: api.validateDepense,
         isAForm: !accorded,
+        clearController: () {},
         onSuccess: (a) {
           // getInfos();
           setState(() {
@@ -503,6 +448,19 @@ class _DetailDepenseState extends State<DetailDepense>
             } else {
               widget.depense.status = accorded ? "1" : "2";
             }
+          }); //patienter 3 secondes
+          Timer(Duration(seconds: 2), () {
+            // Et revenir sur la page de la liste des details
+            print("\n\nquitter la page..\n\n");
+            Navigator.of(context).pop();
+            /* (
+              context,
+              MaterialPageRoute(
+                builder: (context) => AllDepenses(me: widget.me),
+              ),
+            ); */
+
+            print("Retour en arriere");
           });
         },
         onFailure: () {});

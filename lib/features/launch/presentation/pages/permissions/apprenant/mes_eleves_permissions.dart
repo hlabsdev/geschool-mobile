@@ -60,9 +60,12 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
       initialIndex: 0,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(allTranslations.text('absences')),
+          title: Text(allTranslations.text('permissions')),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(15),
+              bottomRight: Radius.circular(15),
+            ),
           ),
           actions: <Widget>[
             IconButton(
@@ -111,7 +114,7 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
           isLoading: isLoading,
           error: error,
           information: information,
-          noDataText: Text(allTranslations.text('no_my_absence')),
+          noDataText: Text(allTranslations.text('no_permission')),
           child: TabBarView(
             children: genTabView(),
           ),
@@ -226,6 +229,7 @@ class _MyStudentAbsenceState extends State<MyStudentPermisions> {
             setState(() {
               information = a.information;
             });
+            getInfos();
             Navigator.of(context).pop(null);
             clearController();
             Navigator.of(context).pop(null);

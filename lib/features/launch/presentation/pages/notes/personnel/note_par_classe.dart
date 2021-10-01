@@ -296,7 +296,7 @@ class _NoteClasseState extends State<NoteClasse> {
             FunctionUtils.displaySnackBar(
                 context, "Notes enregistrées avec succès",
                 type: 1);
-            //pateinter 3 secondes
+            //patienter 3 secondes
             Timer(Duration(seconds: 3), () {
               //  puis fermer le flushbar
               Navigator.of(context).pop(null);

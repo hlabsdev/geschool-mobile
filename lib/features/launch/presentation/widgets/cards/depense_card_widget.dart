@@ -72,7 +72,7 @@ class DepenseCardWidget extends StatelessWidget {
             ),
             isTreated(depense)
                 ? Container(
-                    height: 18,
+                    height: 20,
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color: depense.status == "2"

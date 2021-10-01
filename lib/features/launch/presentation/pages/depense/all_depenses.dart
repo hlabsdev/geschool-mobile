@@ -204,63 +204,67 @@ class _AllDepensesState extends State<AllDepenses> {
                       (i) => Slidable(
                             controller: slidableController,
                             actionPane: SlidableDrawerActionPane(),
-                            secondaryActions: <Widget>[
-                              DepenseCardWidget.isTreated(curentDepense[1][i])
-                                  ? SizedBox(height: 0, width: 0)
-                                  : IconSlideAction(
-                                      caption: 'Detail',
-                                      color: Grey,
-                                      icon: Icons.remove_red_eye_rounded,
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DetailDepense(
-                                              me: widget.me,
-                                              section: sections.firstWhere(
-                                                  (sect) =>
-                                                      sect.keysection ==
-                                                      curentDepense[1][i]
-                                                          .keysection),
-                                              depense: curentDepense[1][i],
-                                              centre: centres.firstWhere(
-                                                  (centre) =>
-                                                      centre
-                                                          .idCenter
-                                                          .toString() ==
-                                                      curentDepense[1][i]
-                                                          .idcentre),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                              DepenseCardWidget.isTreated(curentDepense[1][i])
-                                  ? SizedBox(height: 0, width: 0)
-                                  : curentDepense[1][i].status == "1"
-                                      ? IconSlideAction(
-                                          caption: 'Décaisser',
-                                          color: GreenLight,
-                                          icon: Icons.money_rounded,
+                            secondaryActions:
+                                DepenseCardWidget.isTreated(curentDepense[1][i])
+                                    ? null
+                                    : <Widget>[
+                                        IconSlideAction(
+                                          caption: 'Detail',
+                                          color: Grey,
+                                          icon: Icons.remove_red_eye_rounded,
                                           onTap: () {
-                                            _confirmValidation(
-                                                context,
-                                                curentDepense[1][i],
-                                                true,
-                                                true);
-                                          },
-                                        )
-                                      : IconSlideAction(
-                                          caption: 'Plus',
-                                          color: GreenLight,
-                                          icon: Icons.edit,
-                                          onTap: () {
-                                            _moreAction(
-                                                context, curentDepense[1][i]);
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        DetailDepense(
+                                                  me: widget.me,
+                                                  section: sections.firstWhere(
+                                                      (sect) =>
+                                                          sect.keysection ==
+                                                          curentDepense[1][i]
+                                                              .keysection),
+                                                  depense: curentDepense[1][i],
+                                                  centre: centres.firstWhere(
+                                                      (centre) =>
+                                                          centre.idCenter
+                                                              .toString() ==
+                                                          curentDepense[1][i]
+                                                              .idcentre),
+                                                ),
+                                              ),
+                                            ).then((value) {
+                                              getInfos();
+                                              setState(() {
+                                                // refresh state of the Alldepense page so that it show us the updated datas from detail
+                                              });
+                                            });
                                           },
                                         ),
-                            ],
+                                        curentDepense[1][i].status == "1"
+                                            ? IconSlideAction(
+                                                caption: 'Décaisser',
+                                                color: GreenLight,
+                                                icon: Icons.money_rounded,
+                                                onTap: () {
+                                                  _confirmValidation(
+                                                      context,
+                                                      curentDepense[1][i],
+                                                      true,
+                                                      true);
+                                                },
+                                              )
+                                            : IconSlideAction(
+                                                caption: 'Plus',
+                                                color: GreenLight,
+                                                icon: Icons.edit,
+                                                onTap: () {
+                                                  _moreAction(context,
+                                                      curentDepense[1][i]);
+                                                },
+                                              ),
+                                      ],
                             child: DepenseCardWidget(
                               onTap: () {
                                 Navigator.push(
@@ -278,7 +282,12 @@ class _AllDepensesState extends State<AllDepenses> {
                                           curentDepense[1][i].idcentre),
                                     ),
                                   ),
-                                );
+                                ).then((value) {
+                                  getInfos();
+                                  setState(() {
+                                    // refresh state of the Alldepense page so that it show us the updated datas from detail
+                                  });
+                                });
                               },
                               depense: curentDepense[1][i],
                               trailing: DepenseCardWidget.isTreated(
@@ -447,15 +456,16 @@ class _AllDepensesState extends State<AllDepenses> {
     print(validateDto.toJson());
     Api api = ApiRepository();
     FunctionUtils.sendData(
-        context: context,
-        dto: validateDto,
-        repositoryFunction: api.validateDepense,
-        isAForm: !accorded,
-        clearController: clearController,
-        onSuccess: (a) {
-          getInfos();
-        },
-        onFailure: () {});
+      context: context,
+      dto: validateDto,
+      repositoryFunction: api.validateDepense,
+      isAForm: !accorded,
+      clearController: clearController,
+      onSuccess: (a) {
+        getInfos();
+      },
+      onFailure: () {},
+    );
   }
 
   sendDepense() {

@@ -171,9 +171,10 @@ class _ParametresState extends State<Parametres> {
                   builder: (_) {
                     return AlertDialog(
                       title: Text("Continuer?"),
-                      content: Text(
-                        "Attention! Vous serrez déconnecté après la modification du serveur par defaut, continuer?",
-                        textAlign: TextAlign.justify,
+                      content: Container(
+                        child: Text(
+                          "Attention! Vous serrez déconnecté après la modification du serveur par defaut. \n\nContinuer?",
+                        ),
                       ),
                       actions: [
                         BasicDialogAction(

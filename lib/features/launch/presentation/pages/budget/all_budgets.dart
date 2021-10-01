@@ -646,12 +646,12 @@ class _AllBudgetsState extends State<AllBudgets> {
             decoration: InputDecoration(
               contentPadding: Vx.m2,
               // border: OutlineInputBorder(),
-              labelText: allTranslations.text('motif'),
+              labelText: allTranslations.text('description'),
               // prefixIcon: Icon(Icons.description),
             ),
             validator: (value) {
               if (value.isEmpty) {
-                return allTranslations.text('pls_set_motif');
+                return allTranslations.text('pls_set_description');
               }
               return null;
             },

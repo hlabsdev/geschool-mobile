@@ -16,7 +16,6 @@ import 'package:geschool/features/launch/presentation/widgets/decorations/expand
 import 'package:geschool/features/launch/presentation/widgets/decorations/fab_element.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'dart:math' as math;
 
 // ignore: must_be_immutable
 class DetailPermissionApprenant extends StatefulWidget {
@@ -302,14 +301,14 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
         tooltip: "Accorder",
         icon: Icons.check_circle_rounded,
         backgroundColor: Colors.green,
-        forgroundColor: Colors.white,
+        iconColor: Colors.white,
         onPressed: () => _confirmPermValidation(context, true),
       ),
       FabElement(
         tooltip: "Refuser",
         icon: Icons.cancel_rounded,
         backgroundColor: Colors.redAccent,
-        forgroundColor: Colors.white,
+        iconColor: Colors.white,
         onPressed: () => _confirmPermValidation(context, false),
       ),
     ];
@@ -341,58 +340,9 @@ class _DetailPermissionApprenantState extends State<DetailPermissionApprenant>
 
         //  satus 0: En attente
       } else if (permission.status == "0") {
-        fab = new Column(
-          mainAxisSize: MainAxisSize.min,
-          children: new List.generate(icons.length, (int index) {
-            Widget child = new Container(
-              height: 70.0,
-              width: 56.0,
-              alignment: FractionalOffset.topCenter,
-              child: new ScaleTransition(
-                scale: new CurvedAnimation(
-                  parent: controller,
-                  curve: new Interval(0.0, 1.0 - index / icons.length / 2.0,
-                      curve: Curves.easeOut),
-                ),
-                child: new FloatingActionButton(
-                  heroTag: null,
-                  backgroundColor: icons[index].backgroundColor,
-                  mini: true,
-                  tooltip: icons[index].tooltip,
-                  child: new Icon(icons[index].icon,
-                      color: icons[index].forgroundColor),
-                  onPressed: () {
-                    icons[index].onPressed();
-                  },
-                ),
-              ),
-            );
-            return child;
-          }).toList()
-            ..add(
-              new FloatingActionButton(
-                heroTag: null,
-                child: new AnimatedBuilder(
-                  animation: controller,
-                  builder: (BuildContext context, Widget child) {
-                    return new Transform(
-                      transform: new Matrix4.rotationZ(
-                          controller.value * 0.5 * math.pi),
-                      alignment: FractionalOffset.center,
-                      child: new Icon(
-                          controller.isDismissed ? Icons.menu : Icons.close),
-                    );
-                  },
-                ),
-                onPressed: () {
-                  if (controller.isDismissed) {
-                    controller.forward();
-                  } else {
-                    controller.reverse();
-                  }
-                },
-              ),
-            ),
+        fab = MultiFabWidget(
+          childrens: icons,
+          controller: controller,
         );
       }
       // Staus 1: Accordee mais directeme enregistrer par un personnel

@@ -259,7 +259,14 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                                               isApprenant: false,
                                             ),
                                           ),
-                                        );
+                                        ).then((value) {
+                                          getInfos();
+                                          getCentre();
+                                          getApprenants();
+                                          setState(() {
+                                            // refresh state of the Alldepense page so that it show us the updated datas from detail
+                                          });
+                                        });
                                       },
                                     ),
                                     curentperm[1][i].status == "2"
@@ -305,7 +312,14 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
                                       );
                                     },
                                   ),
-                                );
+                                ).then((value) {
+                                  getInfos();
+                                  getCentre();
+                                  getApprenants();
+                                  setState(() {
+                                    // refresh state of the AllPermission page so that it show us the updated datas from detail
+                                  });
+                                });
                               },
                               permission: curentperm[1][i],
                               trailing: checkActionable(curentperm[1][i])
@@ -481,13 +495,16 @@ class _AllPermissionsApprenantState extends State<AllPermissionsApprenant> {
 
   /// envoie des donnees de validation au serveur
   validate(bool accorded) {
+    setState(() {
+      validateDto.operation = accorded ? "1" : "2";
+    });
     print(validateDto.toJson());
     Api api = ApiRepository();
     FunctionUtils.sendData(
         context: context,
         dto: validateDto,
         repositoryFunction: api.validatePerm,
-        // clearController: clearController,
+        clearController: clearController,
         onSuccess: (a) {
           // rafraichisssement de la page en recuperant de nouveau les donnees
           getInfos();
